@@ -1,0 +1,21 @@
+@import url('https://fonts.googleapis.com/css2?family=Boogaloo&family=Mukta:wght@200;400;800&family=Rye&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Josefin+Sans&display=swap');
+@import "patterns.css";
+
+
+.text-boogaloo{ font-family: 'Boogaloo';}
+.text-rye{ font-family: 'Rye';}
+.text-mukta{ font-family: 'Mukta';}
+
+.alupe{ background-image: url(/alupe.png); background-size: contain; background-repeat: no-repeat;}
+
+:root{
+  --c1: #602660;
+  --c2: #12c5a7;
+  --c3: #f9c754;
+  font-family: 'Josefin Sans';
+}
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
