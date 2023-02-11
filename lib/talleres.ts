@@ -1,22 +1,6 @@
-import { AlumneType } from "./alumnes";
-import { InscripcionType } from "./inscripciones";
 import clientPromise from "./mongodb";
-import { ObjectId } from 'mongodb';
-import { find } from "lodash";
-
-type DiaSemana = 'lun' | 'mar' | 'mie' | 'jue' | 'vie' | 'sab' | 'dom'
-
-export interface TallerPost{
-  nombre: string,
-  dias: DiaSemana[],
-  precios: number[]  // 0: clase suelta, 1: 1 día/sem, 2: 2 días/sem, etc,
-  profe: string,
-  inscripciones?: InscripcionType[]
-}
-
-export interface TallerType extends TallerPost{
-  _id: string
-}
+import { Taller, CrearTaller } from './api';
+import { pick } from "lodash";
 
 export const get_talleres = async () => {
   const client = await clientPromise;
@@ -30,7 +14,8 @@ export const get_talleres = async () => {
           from: "inscripciones",
           localField: "_id",
           foreignField: "taller",
-          as: "inscripciones"
+          as: "inscripciones",
+          pipeline: [{ $match: { activa: true } }]
         }
       },
       {
@@ -51,21 +36,21 @@ export const get_talleres = async () => {
         $unwind: {
           path: "$inscripciones.alumne",
           preserveNullAndEmptyArrays: true
-        } 
+        }
       },
       {
         $project: {
-          nombre: 1, dias: 1, precios: 1, profe: 1, 
+          nombre: 1, horarios: 1, precios: 1, profe: 1,
           'inscripciones.alumne': '$inscripciones.alumne.nombre',
           'inscripciones.iniciada': 1,
-          _id: 0
         }
       },
       {
         $group: {
           _id: {
+            _id: "$_id",
             nombre: "$nombre",
-            dias: "$dias",
+            horarios: "$horarios",
             precios: "$precios",
             profe: "$profe"
           },
@@ -76,29 +61,33 @@ export const get_talleres = async () => {
       },
       {
         $project: {
-          _id: 0,
+          _id: "$_id._id",
           nombre: "$_id.nombre",
-          dias: "$_id.dias",
+          horarios: "$_id.horarios",
           precios: "$_id.precios",
           profe: "$_id.profe",
           inscripciones: 1
         }
       }
     ])
-    .toArray() as TallerType[];
+    .toArray() as Taller[];
 
   return talleres
 }
 
 
-export const post_taller = async (taller: TallerPost) => {
+export const post_taller = async (taller: CrearTaller) => {
   const client = await clientPromise;
   const db = client.db("aluperan_test");
 
-  const query = {nombre: taller.nombre}
-  const update = {$set : taller}
+  const query = { nombre: taller.nombre }
+  const update = { $set: pick(taller, ['nombre', 'precios', 'profe', 'horarios']) }
 
-  const r = await db.collection('talleres').updateOne(query, update, {upsert: true})
+  console.log(update)
+
+  const r = await db.collection('talleres').updateOne(query, update, { upsert: true })
 
   return r.upsertedId
 }
+
+export const put_taller = post_taller

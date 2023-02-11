@@ -1,16 +1,17 @@
 import { useState } from 'react'
 import Head from 'next/head'
-import Link from 'next/link'
-import Alumnes from './alumnes'
+import Alumnes from '../components/alumnes'
 import Inscripciones from './inscripciones'
-import Talleres from './talleres'
+import Talleres from '../components/talleres'
 import Movimientos from './movimientos'
+import { capitalize } from 'lodash';
+import { serialize } from '../lib/utils'
 import { get_alumnes } from '../lib/alumnes'
 import { get_inscripciones } from '../lib/inscripciones'
 import { get_movimientos } from '../lib/movimientos'
 import { get_talleres } from '../lib/talleres'
 
-const serialize = (obj: any[]) => JSON.parse(JSON.stringify(obj))
+
 export async function getServerSideProps() {
   return {
     props: {
@@ -24,6 +25,7 @@ export async function getServerSideProps() {
 
 export default function Home({ alumnes, inscripciones, talleres, movimientos }: any) {
   const [pagina, setPagina] = useState('alumnes')
+  const NavLink = ({addr}: any) => <p className='text-lg my-2 cursor-pointer' onClick={() => setPagina(addr)}>{capitalize(addr)}</p> 
 
   return (
     <div className="container">
@@ -34,10 +36,10 @@ export default function Home({ alumnes, inscripciones, talleres, movimientos }: 
       </Head>
       <div className='flex flex-row w-screen'>
         <div className='textura p-5 flex flex-col px-8 text-rye'>
-          <p className='text-lg my-2 cursor-pointer' onClick={() => setPagina('alumnes')}>Alumnes</p>
-          <p className='text-lg my-2 cursor-pointer' onClick={() => setPagina('talleres')}>Talleres</p>
-          <p className='text-lg my-2 cursor-pointer' onClick={() => setPagina('inscripciones')}>Inscripciones</p>
-          <p className='text-lg my-2 cursor-pointer' onClick={() => setPagina('movimientos')}>Movimientos</p>
+          <NavLink addr='alumnes'/>
+          <NavLink addr='talleres'/>
+          <NavLink addr='inscripciones'/>
+          <NavLink addr='movimientos'/>
           <div className='alupe w-full h-32 mt-auto'></div>
         </div>
         {pagina == 'alumnes' && <Alumnes alumnes={alumnes} />}

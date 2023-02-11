@@ -19,8 +19,6 @@ const balance_inscripcion = (inscripcion: InscripcionType) => {
   const t0 = new Date(inscripcion.iniciada)
   const meses = differenceInMonths(new Date(), t0)
 
-  console.log(`Calculando movimientos para ${inscripcion.alumne.nombre}... (${meses} meses)`)
-
   const tarifas_cobradas: MovimientoType[] = range(meses).map(m => {
     const tarifa_correspondiente = findLast(inscripcion.tarifas, t => isBefore(new Date(t.iniciada), addMonths(t0, m)))?.monto ?? 0;
     return {
@@ -98,6 +96,8 @@ const Inscripcion = ({ inscripcion }: InscripcionProps) => {
         <p className="px-2">{`Balance: ${format_curr(movimientos.reduce((total, m) => total + m.monto, 0))}`}</p>
         <Balance movimientos={movimientos} />
       </>}
+
+      <p className="text-xs">{inscripcion._id}</p>
     </li>
   )
 }
