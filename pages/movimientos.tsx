@@ -1,10 +1,10 @@
 import { get_movimientos } from "../lib/movimientos";
-import { MovimientoType } from "../lib/movimientos";
+import { Movimiento } from "../lib/api";
 
 const serialize = (obj: any[]) => JSON.parse(JSON.stringify(obj))
 
 interface MovimientosProps {
-  movimientos: MovimientoType[]
+  movimientos: Movimiento[]
 }
 
 export async function getServerSideProps() {
@@ -21,7 +21,7 @@ export default function Movimientos({ movimientos }: MovimientosProps) {
 }
 
 export interface BalanceProps {
-  movimientos: MovimientoType[]
+  movimientos: Movimiento[]
 }
 
 export const format_curr = (amnt: number) => amnt >= 0 ? `$${amnt}` : `-$${Math.abs(amnt)}`

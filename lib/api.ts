@@ -122,7 +122,7 @@ export type MovimientoMongo = {
   alumne: ObjectId
 })
 
-export type Movimiento = Omit<MovimientoMongo, 'inscripcion'> & {inscripcion?: Inscripcion}
+export type Movimiento = Omit<MovimientoMongo, 'inscripcion' | '_id'> & {inscripcion?: Inscripcion}
 
 
 // Taller

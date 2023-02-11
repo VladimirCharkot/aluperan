@@ -1,37 +1,39 @@
-import { get_inscripciones, PagoType, TarifaType } from "../lib/inscripciones";
-import { InscripcionType } from "../lib/inscripciones";
+import { get_inscripciones } from "../lib/inscripciones";
+import { Inscripcion, RazonMovimiento } from "../lib/api";
 import { last, sum, range, findLast, concat, sortBy } from 'lodash';
 import { addMonths, differenceInMonths, getMonth, isBefore } from 'date-fns';
-import { Balance, format_curr } from "./movimientos";
-import { RazonType } from '../lib/movimientos';
+import { Balance, format_curr } from "./movimientos"
+import {Movimiento} from '../lib/api';
 
 const serialize = (obj: any[]) => JSON.parse(JSON.stringify(obj))
 
 interface MovimientoType {
   monto: number,
   fecha: Date,
-  razon: RazonType
+  razon: RazonMovimiento
 }
 
 const nombres_meses = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre']
 
-const balance_inscripcion = (inscripcion: InscripcionType) => {
+const balance_inscripcion = (inscripcion: Inscripcion) => {
   const t0 = new Date(inscripcion.iniciada)
   const meses = differenceInMonths(new Date(), t0)
 
-  const tarifas_cobradas: MovimientoType[] = range(meses).map(m => {
+  const tarifas_cobradas: Movimiento[] = range(meses).map(m => {
     const tarifa_correspondiente = findLast(inscripcion.tarifas, t => isBefore(new Date(t.iniciada), addMonths(t0, m)))?.monto ?? 0;
     return {
       monto: -tarifa_correspondiente,
       fecha: addMonths(t0, m),
       razon: 'inscripcion',
+      medio: 'efectivo',
       detalle: 'Tarifa ' + nombres_meses[getMonth(addMonths(t0, m))]
     }
   })
-  const pagos_efectuados: MovimientoType[] = inscripcion.pagos?.map(p => ({
+  const pagos_efectuados: Movimiento[] = inscripcion.pagos?.map(p => ({
     monto: p.monto,
     fecha: new Date(p.fecha),
     razon: 'inscripcion',
+    medio: 'efectivo',
     detalle: `Pago ${nombres_meses[getMonth(new Date(p.fecha))]}`
   })) ?? []
 
@@ -49,7 +51,7 @@ export async function getServerSideProps() {
 
 
 interface InscripcionesProps {
-  inscripcion: InscripcionType[]
+  inscripcion: Inscripcion[]
 }
 
 export default function Inscripciones({ inscripcion }: InscripcionesProps) {
@@ -66,7 +68,7 @@ export default function Inscripciones({ inscripcion }: InscripcionesProps) {
 }
 
 interface InscripcionProps {
-  inscripcion: InscripcionType
+  inscripcion: Inscripcion
 }
 
 const dias = {
