@@ -21,7 +21,10 @@ export const ModalInscripcion = ({ alumne, taller, cerrar, setAlumne }: ModalIns
   const [tall, setTaller] = useState<Taller | undefined>(taller)
   const [alum, setAlum] = useState<Alumne | undefined>(alumne)
 
-  const talleres_disponibles = alum ? talleres.filter(t => !find(alum.inscripciones, i => i.taller._id == t._id)) : []
+  // Talleres que no se encuentren en la lista de inscripciones del alumne
+  const talleres_disponibles = alum ? 
+    talleres.filter(t => !find(alum.inscripciones, i => i.taller._id == t._id)) : 
+    []
 
   const addInscripcion = (inscr: Inscripcion) => setAlumne(a => ({
     ...a,

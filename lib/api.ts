@@ -116,13 +116,30 @@ export type MovimientoMongo = {
   razon: 'otra',
 } | {
   razon: 'inscripcion',
-  inscripcion: string,
+  inscripcion: ObjectId,
+  mes: Mes
 } | {
   razon: 'clase suelta',
-  alumne: ObjectId
+  alumne: ObjectId,
+  taller: ObjectId
+} | {
+  razon: 'liquidacion profe',
+  profe: string,
+  mes: Mes
 })
 
 export type Movimiento = Omit<MovimientoMongo, 'inscripcion' | '_id'> & {inscripcion?: Inscripcion}
+
+
+// Cobros
+
+// export type CobroMongo = {
+//   _id: ObjectId,
+//   monto: number,
+//   fecha: Date,
+//   detalle: string,
+//   inscripcion?: ObjectId
+// }
 
 
 // Taller
@@ -160,6 +177,7 @@ export type Asistencia = Omit<AsistenciaMongo, '_id' | 'alumne' | 'taller'> & {
 // Ayudines 
 
 export type DiaSemana = 'lun' | 'mar' | 'mie' | 'jue' | 'vie' | 'sab' | 'dom'
+export type Mes = 'enero' | 'febrero' | 'marzo' | 'abril' | 'mayo' | 'junio' | 'julio' | 'agosto' | 'septiembre' | 'octubre' | 'noviembre' | 'diciembre'
 
 export interface Horario {
   dia: DiaSemana,
@@ -176,7 +194,7 @@ export interface Pago {
   monto: number
 }
 
-export type RazonMovimiento = 'inscripcion' | 'otra'
+export type RazonMovimiento = 'inscripcion' | 'otra' | 'clase suelta' | 'liquidacion profe'
 
 export type MedioDePago = 'efectivo' | 'mercadopago' | 'tarjeta' | 'otro' | 'no_informado'
 

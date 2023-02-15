@@ -6,7 +6,7 @@ import axios from 'axios'
 
 import { ModalHorario } from "../general/modalHorarios"
 import { Boton } from "../general/boton"
-import { TextInput } from "../general/textinput"
+import { TextInput } from "../general/textInput"
 
 type Handler = ChangeEventHandler<HTMLInputElement>
 
@@ -26,9 +26,9 @@ export const EditarTaller = ({ taller, setTaller, setEditing }: EditarTallerProp
     ...t,
     inscripciones: t.inscripciones.filter(i => i._id != inscr)
   }))
-  const quitarHorario = (horario: Horario) => setTaller(t => ({
+  const quitarHorario = (i: number) => setTaller(t => ({
     ...t,
-    horarios: t.horarios.filter(h => h.dia != horario.dia && h.hora != horario.hora)
+    horarios: [...t.horarios.slice(0, i), ...t.horarios.slice(i + 1)]
   }))
   const updatePrecio = (dias: number, precio: number) => setTaller(t => ({
     ...t,
@@ -59,9 +59,9 @@ export const EditarTaller = ({ taller, setTaller, setEditing }: EditarTallerProp
     <p className="text-xl mt-3">Horarios:</p>
     {taller.horarios.map((h, i) => <div key={i} className="flex flex-row items-center justify-between my-2">
       <p>{dias[h.dia]} {h.hora}</p>
-      <Boton color="red" texto="X" onClick={() => quitarHorario(h)} />
+      <Boton color="red" texto="X" onClick={() => quitarHorario(i)} />
     </div>)}
-    
+
     <Boton color="emerald" texto="Agregar horario" onClick={() => {
       setAgregandoHorario(true);
     }} />

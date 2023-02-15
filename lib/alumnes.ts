@@ -1,13 +1,13 @@
 import clientPromise from "./mongodb";
-import { AlumneMongo, Alumne, CrearAlumne, EditarAlumne } from "./api";
-import { pick } from "lodash";
-import { pipeline } from "stream";
+import { Alumne, CrearAlumne, EditarAlumne } from "./api";
+import { pick, isEmpty } from "lodash";
+import { ObjectId } from "mongodb";
 
 export const get_alumnes = async () => {
   const client = await clientPromise;
   const alumnes = await client.db("aluperan_test").collection('alumnes');
 
-  return await alumnes
+  const alums = await alumnes
     .aggregate([
       {
         $lookup: {
@@ -19,7 +19,7 @@ export const get_alumnes = async () => {
         }
       },
       {
-        $unwind: "$inscripciones"
+        $unwind: {path: "$inscripciones", preserveNullAndEmptyArrays: true}
       },
       {
         $lookup: {
@@ -30,10 +30,7 @@ export const get_alumnes = async () => {
         }
       },
       {
-        $unwind: "$inscripciones.taller"
-      },
-      {
-        $addFields: { "inscripciones.titulo": { $concat: ["$inscripciones.taller.nombre"] } }
+        $unwind: {path: "$inscripciones.taller", preserveNullAndEmptyArrays: true}
       },
       {
         $lookup: {
@@ -57,6 +54,14 @@ export const get_alumnes = async () => {
       }
     ])
     .toArray() as Alumne[];
+
+    alums.forEach(a => {
+      if(isEmpty(a.inscripciones[0])){
+        a.inscripciones = []
+      }
+    })
+
+    return alums
 }
 
 
@@ -73,8 +78,10 @@ export const put_alumne = async (update: EditarAlumne) => {
   const client = await clientPromise;
   const db = client.db("aluperan_test");
 
-  const r = await db.collection('alumnes').updateOne({ _id: update._id },
-    pick(update, ['nombre', 'celular', 'email']))
+  console.log(update)
+
+  const r = await db.collection('alumnes').updateOne({ _id: new ObjectId(update._id) },
+    {$set: pick(update, ['nombre', 'celular', 'email'])})
 
   return r.acknowledged
 }

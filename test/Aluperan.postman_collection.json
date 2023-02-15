@@ -1,0 +1,252 @@
+{
+	"info": {
+		"_postman_id": "377c983d-d174-406f-a605-1ac17a556a74",
+		"name": "Aluperan",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Get talleres",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{aluperan}}/api/talleres",
+					"host": [
+						"{{aluperan}}"
+					],
+					"path": [
+						"api",
+						"talleres"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Post taller",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"pm.collectionVariables.set(\"randomTaller\", ",
+							"_.sample(['Plasticidad en movimiento', 'Circo integral', 'Tela', 'Verticales', 'Flexibilidad', 'Verticales'])",
+							")"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"nombre\": \"{{randomTaller}}\",\n    \"dias\": [\n        \"mar\",\n        \"jue\"\n    ],\n    \"precios\": [\n        1400,\n        4000,\n        6500\n    ],\n    \"profe\": \"{{$randomFullName}}\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{aluperan}}/api/talleres",
+					"host": [
+						"{{aluperan}}"
+					],
+					"path": [
+						"api",
+						"talleres"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get movimientos",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{aluperan}}/api/movimientos",
+					"host": [
+						"{{aluperan}}"
+					],
+					"path": [
+						"api",
+						"movimientos"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Post movimiento",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"pm.collectionVariables.set('randomGuita', ",
+							"    _.random(4,25) * -100);",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"fecha\": \"{{$isoTimestamp}}\",\n  \"monto\": {{randomGuita}},\n  \"razon\": \"otras\",\n  \"detalle\": \"Compras en el chino\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{aluperan}}/api/movimientos",
+					"host": [
+						"{{aluperan}}"
+					],
+					"path": [
+						"api",
+						"movimientos"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Post pago inscripcion",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"fecha\": \"2022-07-06\",\n  \"monto\": 7000,\n  \"razon\": \"inscripcion\",\n  \"inscripcion\": \"63dee5dfc4934df00303fe00\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{aluperan}}/api/movimientos",
+					"host": [
+						"{{aluperan}}"
+					],
+					"path": [
+						"api",
+						"movimientos"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get inscripciones",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{aluperan}}/api/inscripciones",
+					"host": [
+						"{{aluperan}}"
+					],
+					"path": [
+						"api",
+						"inscripciones"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Post inscripcion",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"iniciada\": \"{{$isoTimestamp}}\",\n    \"activa\": true,\n    \"alumne\": \"63de6c9bc43d7273d24dcd4e\",\n    \"taller\": \"63e14095d1c532176d2add71\",\n    \"titulo\": \"Jara - Cuerda Lisa mar-jue-18hs\",\n    \"tarifas\": [\n        {\n            \"iniciada\": \"2022-11-02T00:00:00.000Z\",\n            \"monto\": 4000\n        }\n    ]\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{aluperan}}/api/inscripciones",
+					"host": [
+						"{{aluperan}}"
+					],
+					"path": [
+						"api",
+						"inscripciones"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get alumnes",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{aluperan}}/api/alumnes",
+					"host": [
+						"{{aluperan}}"
+					],
+					"path": [
+						"api",
+						"alumnes"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Post alumne",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"nombre\": \"{{$randomFullName}}\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{aluperan}}/api/alumnes",
+					"host": [
+						"{{aluperan}}"
+					],
+					"path": [
+						"api",
+						"alumnes"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"variable": [
+		{
+			"key": "randomGuita",
+			"value": ""
+		},
+		{
+			"key": "randomTaller",
+			"value": ""
+		}
+	]
+}

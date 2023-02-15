@@ -12,7 +12,7 @@ export const InfoAlumne = ({ alumne }: AlumneInfoProps) => {
     <>
       <h2 className="text-2xl">{alumne.nombre}</h2>
       <hr />
-      <Enumerador cabecera="Inscripciones:" coleccion={alumne.inscripciones} accesor={a => a.titulo} nodata='Sin inscripciones' />
+      <Enumerador cabecera="Inscripciones:" coleccion={alumne.inscripciones} accesor={i => `${i.taller.nombre} (${i.dias})`} nodata='Sin inscripciones' />
       <Enumerador cabecera="Celular:" coleccion={alumne.celular ? [alumne.celular] : []} nodata='Sin celular' />
       <Enumerador cabecera="Mail:" coleccion={alumne.email ? [alumne.email] : []} nodata='Sin mail' />
 

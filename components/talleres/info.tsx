@@ -1,8 +1,9 @@
 import { Taller } from "../../lib/api"
 import { Id } from "../general/id"
-import { dias } from "../../lib/utils"
+import { dias, dias_semana } from "../../lib/utils"
 import { Enumerador } from "../general/enumerador"
 import { Horario } from "../../lib/api"
+import { range } from "lodash"
 
 interface InfoTallerProps {
   taller: Taller
@@ -14,8 +15,8 @@ export const InfoTaller = ({ taller }: InfoTallerProps) => {
     <hr />
 
     <Enumerador cabecera="Horarios:" coleccion={taller.horarios} accesor={(h: Horario) => `${dias[h.dia]} ${h.hora}`} nodata='Sin horarios' />
-    <Enumerador cabecera="Precios:" coleccion={taller.precios.map((c, i) => `${i} días: $${c}`).slice(1)} nodata='Sin precios' />
-    <Enumerador cabecera="Alumnes:" coleccion={taller.inscripciones.map(i => i.alumne)} nodata='Sin precios' />
+    <Enumerador cabecera="Precios:" coleccion={taller.precios.map((c, i) => `${dias_semana[i]}: $${c}`)} nodata='Sin precios' />
+    <Enumerador cabecera="Alumnes:" coleccion={taller.inscripciones.map(i => i.alumne)} nodata='Sin alumnes' />
 
     <Id id={taller._id} />
   </>)

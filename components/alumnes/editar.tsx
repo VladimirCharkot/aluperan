@@ -1,5 +1,5 @@
 import { Dispatch, SetStateAction, ChangeEventHandler, useState } from "react";
-import { TextInput } from "../general/textinput";
+import { TextInput } from "../general/textInput";
 import { Boton } from "../general/boton";
 import { ModalInscripcion } from "../general/modalInscripcion";
 import { Alumne} from "../../lib/api";
@@ -29,9 +29,9 @@ export const EditarAlumne = ({ alumne, setAlum, setEditing }: EditarAlumneProps)
     r => { if (r.status == 200) deleteInscripcion(id) }
   )
 
-  const update = () => axios.post('/api/alumnes', alumne).then(
-    r => { setEditing(false); }
-  )
+  const update = () => {console.log("Enviando..."); console.log(alumne); axios.put('/api/alumnes', alumne).then(
+    r => { console.log(r); setEditing(false); }
+  )}
 
   return (
     <>
