@@ -25,7 +25,8 @@ export const ModalNuevoTaller = ({ cerrar }: ModalNuevoTallerProps) => {
     nombre: '',
     profe: '',
     horarios: [],
-    precios: [0]
+    precios: [0],
+    iniciado: new Date()
   })
 
   const [precioNaN, setPrecioNaN] = useState(false)

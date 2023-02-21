@@ -1,6 +1,6 @@
 import { ObjectId } from "mongodb";
 import clientPromise from "./mongodb";
-import { Alumne, Taller, Inscripcion, CrearInscripcion, EditarInscripcion } from "./api";
+import { Alumne, Taller, Inscripcion, EditarInscripcion, InscripcionPost } from "./api";
 import { last, pick } from "lodash";
 
 
@@ -34,7 +34,7 @@ export const get_inscripciones = async () => {
         $unwind: "$alumne"
       },
       {
-        $addFields: { titulo: { $concat: ["$alumne.nombre", " - ", "$taller.nombre"] } }
+        $addFields: { titulo: { $concat: ["$taller.nombre", " - ", "$alumne.nombre"] } }
       },
       {
         $lookup: {
@@ -51,29 +51,29 @@ export const get_inscripciones = async () => {
   return inscripciones
 }
 
-export const post_inscripcion = async (inscripcion: CrearInscripcion) => {
+export const post_inscripcion = async (inscripcion: InscripcionPost) => {
   const client = await clientPromise;
   const db = client.db("aluperan_test")
 
   const alumne = await db.collection<Alumne>("alumnes").findOne({ _id: new ObjectId(inscripcion.alumne) as any })
   const taller = await db.collection<Taller>("talleres").findOne({ _id: new ObjectId(inscripcion.taller) as any })
 
-  if (!taller) return 'Error / No hay taller para esta inscripcion'
-  if (!alumne) return 'Error / No hay alumne para esta inscripcion'
+  // if (!taller) return 'Error / No hay taller para esta inscripcion'
+  // if (!alumne) return 'Error / No hay alumne para esta inscripcion'
 
   const insc = {
     activa: true,
     dias: inscripcion.dias,
-    iniciada: new Date(),
+    iniciada: inscripcion.iniciada ?? new Date(),
     alumne: new ObjectId(inscripcion.alumne),
     taller: new ObjectId(inscripcion.taller),
-    tarifas: [{ monto: last(taller.precios), iniciada: new Date() }]
+    tarifas: [{ monto: last(taller!.precios), iniciada: new Date() }]
   }
 
   const r = await db.collection('inscripciones').insertOne(insc)
 
-  if (r.insertedId)
-    return await db.collection<Inscripcion>('inscripciones').findOne({ _id: new ObjectId(r.insertedId) } as any)
+  
+  return {...insc, _id: r.insertedId} 
 }
 
 

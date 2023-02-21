@@ -1,6 +1,6 @@
 import clientPromise from "./mongodb";
 import { ObjectId } from "mongodb";
-import { CrearAsistencia } from "./api";
+import { AsistenciaMongo } from "./api";
 
 
 export const get_asistencias = async (taller?: string) => {
@@ -24,7 +24,7 @@ export const get_asistencias = async (taller?: string) => {
   return asistencias
 }
 
-export const post_asistencia = async (asistencia : CrearAsistencia) => {
+export const post_asistencia = async (asistencia : AsistenciaMongo) => {
   const client = await clientPromise;
   const db = client.db("aluperan_test");
 

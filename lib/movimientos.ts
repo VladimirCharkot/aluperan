@@ -1,27 +1,25 @@
-import { Inscripcion, Mes, Movimiento, MovimientoMongo } from "./api";
+import { Inscripcion, Mes, Movimiento, MovimientoMongo, MovimientoLiquidacionProfe, MovimientoClaseSuelta, MovimientoInscripcion } from "./api";
 import clientPromise from "./mongodb";
 import { ObjectId, Db, MongoClient, Collection, Document } from "mongodb";
 import { pick } from "lodash";
-import { es } from "date-fns/locale";
+import { nombres_meses } from "../lib/utils";
 
 // pick(movimiento, ['razon', 'fecha', 'monto', 'detalle'])
 
 
-type MovimientoInscripcion = Movimiento & { inscripcion: string }
-type MovimientoClaseSuelta = Movimiento & { alumne: ObjectId, taller: ObjectId }
-type MovimientoLiquidacionProfe = Movimiento & { profe: string, mes: Mes }
 
-export class AlmacenMovimientos{
+
+export class AlmacenMovimientos {
   private db: Db;
 
-  public static async build(){
+  public static async build() {
     const client = await clientPromise
     return new AlmacenMovimientos(client);
   }
-  
+
   constructor(private client: MongoClient) {
     this.db = this.client.db("aluperan_test")
-   }
+  }
 
   async get() {
     const movimientos = await this
@@ -37,14 +35,14 @@ export class AlmacenMovimientos{
       return this.insertarPagoInscripcion(movimiento as MovimientoInscripcion)
     } else if (movimiento.razon == 'clase suelta') {
       return this.insertarPagoClaseSuelta(movimiento as MovimientoClaseSuelta)
-    } else if (movimiento.razon == 'liquidacion profe'){
+    } else if (movimiento.razon == 'liquidacion profe') {
       return this.insertarLiquidacionProfe(movimiento as MovimientoLiquidacionProfe)
-    } else if (movimiento.razon == 'otra'){
+    } else if (movimiento.razon == 'otra') {
       return this.insertarGenerico(movimiento)
     }
   }
 
-  async put(movimiento: { _id: string, detalle: string }){
+  async put(movimiento: { _id: string, detalle: string }) {
     const r = await this.db.collection('movimientos').updateOne({ _id: new ObjectId(movimiento._id) }, pick(movimiento, ['detalle']))
     return r.upsertedId
   }
@@ -53,23 +51,19 @@ export class AlmacenMovimientos{
     const i = await this.db.collection<Inscripcion>('inscripciones')
       .findOne({ _id: new ObjectId(movimiento.inscripcion) as any })
 
-    if (!i) return 'ERROR - Inscripcion inextistente'
-
     const alumne = await this.db.collection('alumnes')
-      .findOne({ _id: i.alumne })
+      .findOne({ _id: i!.alumne })
 
     const taller = await this.db.collection('talleres')
-      .findOne({ _id: i.taller })
-
-    if (!alumne || !taller) return 'ERROR - Inscripcion errónea'
+      .findOne({ _id: i!.taller })
 
     const r = await this.db.collection('movimientos').insertOne({
       ...movimiento,
       inscripcion: new ObjectId(movimiento.inscripcion),
-      detalle: `Pago de ${alumne.nombre} - ${taller.nombre}`
+      detalle: `Pago de ${alumne!.nombre} - ${taller!.nombre}`
     })
 
-    return r.acknowledged
+    return { ...movimiento, _id: r.insertedId }
   }
 
   async insertarPagoClaseSuelta(movimiento: MovimientoClaseSuelta) {
@@ -79,28 +73,31 @@ export class AlmacenMovimientos{
     const taller = await this.db.collection('talleres')
       .findOne({ _id: movimiento.taller })
 
-    if (!alumne || !taller) return 'ERROR - Alumne o taller erróneos' 
+    if (!alumne || !taller) return 'ERROR - Alumne o taller erróneos'
 
     const r = await this.db.collection('movimientos').insertOne({
       ...movimiento,
       detalle: `Pago de ${alumne.nombre} por clase suelta de ${taller.nombre}`
     })
 
-    return r.acknowledged
+    return { ...movimiento, _id: r.insertedId }
 
   }
 
-  async insertarLiquidacionProfe(movimiento: MovimientoLiquidacionProfe){
-    const r = await this.db.collection('movimientos').insertOne({
+  async insertarLiquidacionProfe(movimiento: MovimientoLiquidacionProfe) {
+    const taller = await this.db.collection('talleres').findOne({_id: new ObjectId(movimiento.taller)});
+    const mov = {
       ...movimiento,
-      detalle: `Liquidación ${movimiento.mes} para ${movimiento.profe}`
-    }) 
-    return r.acknowledged
+      taller: new ObjectId(movimiento.taller),
+      detalle: `Liquidación ${nombres_meses[new Date(movimiento.mes).getMonth()]} para ${taller!.nombre}`
+    }
+    const r = await this.db.collection('movimientos').insertOne(mov)
+    return { ...mov, _id: r.insertedId }
   }
 
-  async insertarGenerico(movimiento: Movimiento){
+  async insertarGenerico(movimiento: Movimiento) {
     const r = await this.db.collection('movimientos').insertOne(movimiento)
-    return r.acknowledged
+    return { ...movimiento, _id: r.insertedId }
   }
 
 }

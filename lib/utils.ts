@@ -1,6 +1,6 @@
-import { addMonths, differenceInMonths, getMonth, isBefore, startOfMonth } from 'date-fns';
+import { addMonths, differenceInMonths, endOfMonth, getMonth, isAfter, isBefore, startOfMonth } from 'date-fns';
 import { flatten, range, findLast, concat, sortBy } from 'lodash';
-import { Inscripcion, Movimiento } from './api';
+import { Inscripcion, Movimiento, Taller } from './api';
 
 export const serialize = (obj: any[]) => JSON.parse(JSON.stringify(obj))
 
@@ -34,7 +34,7 @@ export const balance_inscripcion = (inscripcion: Inscripcion) => {
       monto: -tarifa_correspondiente,
       fecha: fecha,
       razon: 'inscripcion',
-      medio: 'efectivo',
+      medio: '-',
       detalle: 'Tarifa ' + nombres_meses[getMonth(fecha)]
     }
   })
@@ -51,3 +51,4 @@ export const balance_inscripcion = (inscripcion: Inscripcion) => {
 
   return movimientos
 }
+

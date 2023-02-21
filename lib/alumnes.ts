@@ -1,5 +1,5 @@
 import clientPromise from "./mongodb";
-import { Alumne, CrearAlumne, EditarAlumne } from "./api";
+import { Alumne, AlumnePost, EditarAlumne } from "./api";
 import { pick, isEmpty } from "lodash";
 import { ObjectId } from "mongodb";
 
@@ -66,11 +66,11 @@ export const get_alumnes = async () => {
 
 
 
-export const post_alumne = async (alumne: CrearAlumne) => {
+export const post_alumne = async (alumne: AlumnePost) => {
   const client = await clientPromise;
   const alumnes = await client.db("aluperan_test").collection('alumnes');
   const r = await alumnes.insertOne(pick(alumne, ['nombre', 'celular', 'email']))
-  return r.insertedId
+  return {...alumne, _id: r.insertedId}
 }
 
 

@@ -59,7 +59,7 @@ export default function Home({ alums, inscs, talls, movs }: any) {
           </div>
           {pagina == 'alumnes' && <Alumnes alumnes={alumnes} />}
           {pagina == 'talleres' && <Talleres talleres={talleres} />}
-          {pagina == 'inscripciones' && <Inscripciones inscripcion={inscripciones} />}
+          {pagina == 'inscripciones' && <Inscripciones inscripciones={inscripciones} />}
           {pagina == 'movimientos' && <Movimientos movimientos={movimientos} />}
         </div>
       </div>

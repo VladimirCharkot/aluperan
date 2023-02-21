@@ -1,6 +1,7 @@
 import clientPromise from "./mongodb";
-import { Taller, CrearTaller } from './api';
-import { pick } from "lodash";
+import { Taller, TallerPost, TallerPut } from './api';
+import { pick, isEmpty } from "lodash";
+import { ObjectId } from "mongodb";
 
 export const get_talleres = async () => {
   const client = await clientPromise;
@@ -40,7 +41,7 @@ export const get_talleres = async () => {
       },
       {
         $project: {
-          nombre: 1, horarios: 1, precios: 1, profe: 1,
+          nombre: 1, horarios: 1, precios: 1, profe: 1, iniciado: 1,
           'inscripciones.alumne': '$inscripciones.alumne.nombre',
           'inscripciones.iniciada': 1,
         }
@@ -52,7 +53,8 @@ export const get_talleres = async () => {
             nombre: "$nombre",
             horarios: "$horarios",
             precios: "$precios",
-            profe: "$profe"
+            profe: "$profe",
+            iniciado: "$iniciado"
           },
           inscripciones: {
             $push: "$inscripciones"
@@ -66,28 +68,44 @@ export const get_talleres = async () => {
           horarios: "$_id.horarios",
           precios: "$_id.precios",
           profe: "$_id.profe",
+          iniciado: "$_id.iniciado",
           inscripciones: 1
         }
       }
     ])
     .toArray() as Taller[];
 
+  talleres.forEach(t => {
+    if (isEmpty(t.inscripciones[0])) {
+      t.inscripciones = []
+    }
+  })
+
   return talleres
 }
 
 
-export const post_taller = async (taller: CrearTaller) => {
+export const post_taller = async (taller: TallerPost) => {
   const client = await clientPromise;
   const db = client.db("aluperan_test");
 
-  const query = { nombre: taller.nombre }
-  const update = { $set: pick(taller, ['nombre', 'precios', 'profe', 'horarios']) }
+  console.log(`Insertando taller:`)
+  console.log({
+    ...pick(taller, ['nombre', 'precios', 'profe', 'horarios', 'iniciado']),
+    iniciado: taller.iniciado ?? new Date()
+  })
 
-  console.log(update)
+  const r = await db.collection('talleres').insertOne({
+    ...pick(taller, ['nombre', 'precios', 'profe', 'horarios', 'iniciado']),
+    iniciado: taller.iniciado ?? new Date()
+  })
 
-  const r = await db.collection('talleres').updateOne(query, update, { upsert: true })
-
-  return r.upsertedId
+  return { ...taller, _id: r.insertedId }
 }
 
-export const put_taller = post_taller
+export const put_taller = async (updates: TallerPut) => {
+  const client = await clientPromise;
+  const db = client.db("aluperan_test");
+  const r = await db.collection('talleres').updateOne({ _id: new ObjectId(updates._id) }, { $set: pick(updates, ['nombre', 'precios', 'profe', 'horarios']) })
+  return r.acknowledged
+}

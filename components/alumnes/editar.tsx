@@ -53,7 +53,7 @@ export const EditarAlumne = ({ alumne, setAlum, setEditing }: EditarAlumneProps)
 
       <p className="text-xl mt-3">Inscripciones:</p>
       {alumne.inscripciones.map(i => <div key={i._id} className="flex flex-row items-center justify-between my-2">
-        <p>{i.titulo}</p>
+        <p>{`${i.taller.nombre} (${i.dias})`}</p>
         <Boton color="red" texto="Baja" onClick={() => baja(i._id)} />
       </div>)}
 

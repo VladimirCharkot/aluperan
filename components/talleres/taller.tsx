@@ -22,7 +22,7 @@ export const CartaTaller = ({ taller }: CartaTallerProps) => {
       {editing && <EditarTaller taller={tall} setTaller={setTall} setEditing={setEditing} />}
 
       <Controles>
-        {!editing && <Boton color="indigo" texto="Editar" onClick={() => { setEditing(true); }} />}
+      {!editing && <Boton color="indigo" texto="Editar" onClick={() => { setEditing(true); }} />}
       </Controles>
     </Carta>
 
