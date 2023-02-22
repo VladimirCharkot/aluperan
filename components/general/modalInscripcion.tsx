@@ -1,9 +1,10 @@
-import { Dispatch, SetStateAction, useEffect, useState } from 'react';
+import { Dispatch, SetStateAction, useContext, useEffect, useState } from 'react';
 import { Alumne, Taller, Inscripcion } from '../../lib/api';
 import { Modal } from './modal';
 import { Boton } from './boton';
 import axios from 'axios';
 import { find, range } from 'lodash';
+import { AppContext } from '../context';
 
 interface ModalInscripcionProps {
   alumne?: Alumne,
@@ -14,32 +15,30 @@ interface ModalInscripcionProps {
 
 export const ModalInscripcion = ({ alumne, taller, cerrar, setAlumne }: ModalInscripcionProps) => {
 
-  const [talleres, setTalleres] = useState<Taller[]>([])
-  const [alumnes, setAlumnes] = useState<Alumne[]>([])
+  const { talleres, alumnes, setInscripciones } = useContext(AppContext);
+
   const [dias, setDias] = useState<Number | null>(null)
 
   const [tall, setTaller] = useState<Taller | undefined>(taller)
   const [alum, setAlum] = useState<Alumne | undefined>(alumne)
 
   // Talleres que no se encuentren en la lista de inscripciones del alumne
-  const talleres_disponibles = alum ? 
-    talleres.filter(t => !find(alum.inscripciones, i => i.taller._id == t._id)) : 
+  const talleres_disponibles = alum ?
+    talleres.filter(t => !find(alum.inscripciones, i => i.taller._id == t._id)) :
     []
 
-  const addInscripcion = (inscr: Inscripcion) => setAlumne(a => ({
-    ...a,
-    inscripciones: [...a.inscripciones, inscr]
-  }))
-
-  useEffect(() => {
-    axios.get('/api/alumnes').then(r => { if (r.status == 200) setAlumnes(r.data); else console.log(r); })
-    axios.get('/api/talleres').then(r => { if (r.status == 200) setTalleres(r.data); else console.log(r); })
-  }, [])
+  const addInscripcion = (inscr: Inscripcion) => {
+    setAlumne(a => ({
+      ...a,
+      inscripciones: [...a.inscripciones, inscr]
+    }))
+    setInscripciones(ins => [...ins, inscr])
+  }
 
   const inscribir = () => {
     if (alum && tall && dias)
       axios.post('/api/inscripciones', { alumne: alum._id, taller: tall._id, dias: dias }).then(
-        r => {if (r.status == 200) addInscripcion({ ...r.data, titulo: tall.nombre }); cerrar(); }
+        r => { if (r.status == 200) addInscripcion({ ...r.data, taller: find(talleres, t => t._id == r.data.taller) }); console.log(`Inscripcion agregada`); console.log(r.data); console.log(tall); cerrar(); }
       )
     else {
       alert('Falta algo che')

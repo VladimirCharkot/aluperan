@@ -24,7 +24,7 @@ export const ModalNuevoAlumne = ({ cerrar }: ModalNuevoAlumneProps) => {
   const agregarAlumne = () => {
     axios.post('/api/alumnes', alumne).then(r => {
       if (r.status == 200) {
-        setAlumnes(alums => [...alums, {...alumne, _id: r.data.id, inscripciones: [], pagos: []}])
+        setAlumnes(alums => [...alums, {...alumne, ...r.data, inscripciones: [], pagos: []}])
         cerrar()
       }
     })

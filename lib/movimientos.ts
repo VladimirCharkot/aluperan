@@ -97,6 +97,8 @@ export class AlmacenMovimientos {
 
   async insertarGenerico(movimiento: Movimiento) {
     const r = await this.db.collection('movimientos').insertOne(movimiento)
+    console.log(`Insertando movimiento`)
+    console.log(movimiento)
     return { ...movimiento, _id: r.insertedId }
   }
 

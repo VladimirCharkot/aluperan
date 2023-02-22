@@ -1,4 +1,4 @@
-import { ChangeEventHandler, Dispatch, SetStateAction, useContext, useState } from "react";
+import { ChangeEventHandler, Dispatch, SetStateAction, useContext, useEffect, useState } from "react";
 import { Modal } from "./modal";
 import { Boton } from "./boton";
 import { MedioDePago, Movimiento, RazonMovimiento } from "../../lib/api";
@@ -24,21 +24,26 @@ export const ModalMovimiento = ({ cerrar }: any) => {
     razon: "otra"
   })
 
+  useEffect(() =>  { console.log(movimiento)} , [movimiento])
+
   const [numberIsNaN, setNaN] = useState(false)
 
   const updateMonto = (m: number) => setMovimiento(mov => ({...mov, monto: m}))
   const updateMedio = (m: MedioDePago) => setMovimiento(mov => ({...mov, medio: m}))
-  const updateRazon = (r: RazonMovimiento) => setMovimiento(mov => ({...mov, razon: r}))
+  // const updateRazon = (r: RazonMovimiento) => setMovimiento(mov => ({...mov, razon: r}))
   const updateDetalle = (d: string) => setMovimiento(mov => ({...mov, detalle: d}))
 
   const legal = movimiento.monto && movimiento.detalle && movimiento.medio && !numberIsNaN
 
   const agregarMovimiento = () => {
-    if (legal)
+    if (legal){
+      console.log(`Enviando movimiento`)
+      console.log(movimiento)
       axios.post('/api/movimientos', movimiento).then(r => {
         setMovimientos(ms => [...ms, movimiento]) 
         cerrar()
       })
+    }
   }
 
   return (
@@ -53,7 +58,7 @@ export const ModalMovimiento = ({ cerrar }: any) => {
 
         <p className='p-4'>Medio:</p> 
         <select className='p-4' onChange={e => updateMedio(e.target.value as MedioDePago)}>
-          {medios.map(m => <option key={m} value={movimiento.medio}>{capitalize(m)}</option>)}
+          {medios.map(m => <option key={m} value={m}>{capitalize(m)}</option>)}
         </select>
 
         <p className='p-4'>Detalle:</p>
