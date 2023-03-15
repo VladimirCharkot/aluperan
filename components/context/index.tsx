@@ -1,5 +1,5 @@
 import { createContext, Dispatch, SetStateAction } from "react";
-import { Alumne, Inscripcion, Movimiento, Taller } from "../../lib/api";
+import { Alumne, Asistencia, Inscripcion, Movimiento, Taller } from "../../lib/api";
 
 interface AppContextInterface{
   alumnes: Alumne[],
@@ -9,7 +9,9 @@ interface AppContextInterface{
   movimientos: Movimiento[],
   setMovimientos: Dispatch<SetStateAction<Movimiento[]>>,
   talleres: Taller[],
-  setTalleres: Dispatch<SetStateAction<Taller[]>>
+  setTalleres: Dispatch<SetStateAction<Taller[]>>,
+  asistencias: Asistencia[],
+  setAsistencias: Dispatch<SetStateAction<Asistencia[]>>
 }
 
 export const AppContext = createContext<AppContextInterface>({
@@ -17,8 +19,10 @@ export const AppContext = createContext<AppContextInterface>({
   inscripciones: [],
   movimientos: [],
   talleres: [],
+  asistencias: [],
   setAlumnes: () => {},
   setInscripciones: () => {},
   setMovimientos: () => {},
-  setTalleres: () => {}
+  setTalleres: () => {},
+  setAsistencias: () => {}
 })

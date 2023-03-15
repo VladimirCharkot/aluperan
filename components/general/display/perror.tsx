@@ -1,0 +1,1 @@
+export const PError = ({children}: {children: React.ReactNode}) => <p className="text-xs text-red-400">{children}</p>

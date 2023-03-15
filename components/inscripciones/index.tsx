@@ -1,13 +1,16 @@
+import { useState, useContext } from "react";
+import { sortBy } from "lodash";
 import { Inscripcion } from "../../lib/api";
 import { CartaInscripcion } from "./inscripcion";
-import { sortBy } from "lodash";
-import { useState } from "react";
+import { AppContext } from "../context";
 
 interface InscripcionesProps {
   inscripciones: Inscripcion[]
 }
 
-export default function Inscripciones({ inscripciones }: InscripcionesProps) {
+export default function Inscripciones() {
+  const { inscripciones } = useContext(AppContext);
+
   const inscs = sortBy(sortBy(inscripciones, i => i.titulo), i => !i.activa)
   const [filtro, setFiltro] = useState('')
 

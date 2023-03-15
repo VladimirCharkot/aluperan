@@ -3,9 +3,9 @@ import { readFileSync, statSync } from 'fs';
 
 let uri
 try{
-  const envExists = statSync('../.env.local').isFile()
+  const envExists = statSync('./.env.local').isFile()
   let envUri: string | undefined = undefined
-  if(envExists) envUri = readFileSync('../.env.local', 'utf-8').split('=')[1].split('?')[0]
+  if(envExists) envUri = readFileSync('./.env.local', 'utf-8').split('=')[1].split('?')[0]
   uri = process.env.MONGODB_URI || envUri
 }catch{
   uri = process.env.MONGODB_URI

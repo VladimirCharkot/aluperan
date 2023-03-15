@@ -1,49 +1,31 @@
+// --- // --- // --- // --- // --- // --- // --- // --- // --- / --- //
+//
+// Para cada clase establecemos cómo se ve en Mongo, 
+// cómo se ve en el frontend (sin sufijo), y cómo se ven
+// sus operaciones post y update
+// En Mongo, los ids son ObjectId, en el frontend son strings
+//
+// --- // --- // --- // --- // --- // --- // --- // --- // --- / --- //
+
+
 import { ObjectId } from 'mongodb';
-
-// API
-
-export type OperacionApi =
-  { op: "alumne.crear", cmd: AlumnePost } |
-  { op: "taller.crear", cmd: TallerPost } |
-  { op: "inscripcion.crear", cmd: InscripcionPost } |
-  { op: "movimiento.crear", cmd: MovimientoPost } 
-  // { op: "asistencia.crear", cmd: CrearAsistencia } 
-  // { op: "alumne.crear", cmd: CrearAlumne } |
-  // { op: "taller.crear", cmd: CrearTaller } |
-  // { op: "inscripcion.crear", cmd: CrearInscripcion } |
-  // { op: "movimiento.crear", cmd: CrearMovimiento } |
-  // { op: "asistencia.crear", cmd: CrearAsistencia } 
-
-export type EditarAlumne = {_id: string} & Partial<Omit<AlumneMongo, '_id'>>
-
-export type EditarInscripcion = { _id: MongoId, activa?: boolean, iniciada?: Date, dias?: number, tarifa?: Tarifa }
-
-// export type CrearAsistencia = {
-//   alumne: MongoId,
-//   taller: MongoId,
-//   inscripcion: MongoId,
-//   fecha?: Date
-// }
 
 export type MongoId = string
 
 
-// --- // -- // --- // --- // --- // --- // --- // --- // --- / --- //
-
-
 // Alumne
 
-export type AlumneMongo = {
-  _id: ObjectId,
+export type AlumneBase = {
   nombre: string,
   celular?: string,
   email?: string
 }
 
-export type AlumnePost = Omit<AlumneMongo, '_id'>
-
-export type Alumne = Omit<AlumneMongo, '_id' | 'inscripciones' | 'pagos'> & { 
-  _id: string,
+export type AlumneMongo = AlumneBase & { _id: ObjectId }
+export type AlumnePut = Partial<AlumneBase> & { _id: MongoId }
+export type AlumnePost = AlumneBase 
+export type Alumne = AlumneBase & {
+  _id: MongoId,
   inscripciones: Inscripcion[],
   pagos: Pago[]
 }
@@ -51,72 +33,73 @@ export type Alumne = Omit<AlumneMongo, '_id' | 'inscripciones' | 'pagos'> & {
 
 // Inscripciones
 
-export type InscripcionMongo = {
-  _id: ObjectId,
+export type InscripcionBase = {
   iniciada: Date,
   activa: boolean,
-  alumne: ObjectId,
-  taller: ObjectId,
   tarifas: Tarifa[],
   baja?: Date,
   dias: number
 }
 
-export type InscripcionPost = Omit<InscripcionMongo, '_id' | 'iniciada' | 'activa' | 'tarifas' | 'baja' | 'alumne' | 'taller'> & {
-  tarifa_inicial?: Tarifa,
+export type InscripcionMongo = InscripcionBase & { _id: ObjectId, alumne: ObjectId, taller: ObjectId }
+
+export type InscripcionPost = {
+  tarifa_inicial?: Tarifa,      // Las tarifas son solo de referencia
   alumne: MongoId,
   taller: MongoId,
   dias: number,
   iniciada?: Date
 }
 
-export type Inscripcion = Omit<InscripcionMongo, '_id' | 'alumne' | 'taller'> & {
+export type InscripcionPut = {
+  _id: MongoId,
+  iniciada?: Date,
+  activa?: boolean,
+  dias?: number,
+  tarifa?: Tarifa
+}
+
+export type Inscripcion = InscripcionBase & {
   _id: string,
   alumne: Alumne,
   taller: Taller
-  titulo?: string,
   pagos: Pago[],
-  dias: number
+  titulo?: string
 }
 
 
 // Movimientos
 
-export type MovimientoMongo = {
-  _id: ObjectId,
+export type MovimientoBase = {
   monto: number,
   medio: MedioDePago
   fecha: Date,
-  detalle: string,
-} & ({
-  razon: 'otra',
-} | {
-  razon: 'inscripcion',
-  inscripcion: ObjectId,
-  mes: Date
-} | {
-  razon: 'clase suelta',
-  alumne: ObjectId,
-  taller: ObjectId
-} | {
-  razon: 'liquidacion profe',
-  taller: ObjectId,
-  mes: Date
-})
+  detalle: string
+}
 
-export type MovimientoPost = Omit<MovimientoMongo, '_id' | 'fecha'>
+export type MovimientoGenerico = MovimientoBase & { razon: 'otra' }
 
-export type MovimientoBase = Omit<MovimientoMongo, 'detalle' | '_id'>
-export type MovimientoGenerico = MovimientoBase & { detalle: string }
-export type MovimientoInscripcion = MovimientoBase & { inscripcion: string }
-export type MovimientoClaseSuelta = MovimientoBase & { alumne: MongoId, taller: MongoId }
-export type MovimientoLiquidacionProfe = MovimientoBase & { taller: MongoId, mes: Date }
-export type Movimiento = (MovimientoGenerico | MovimientoInscripcion | MovimientoClaseSuelta | MovimientoLiquidacionProfe) & {detalle: string}
+export type MovimientoInscripcion = MovimientoBase & { razon: 'inscripcion', inscripcion: Inscripcion, mes: Date }
+export type MovimientoClaseSuelta = MovimientoBase & { razon: 'clase suelta', alumne: Alumne, taller: Taller }
+export type MovimientoLiquidacionProfe = MovimientoBase & { razon: 'liquidacion profe', taller: Taller, mes: Date }
+
+export type MovimientoInscripcionMongo = MovimientoBase & { razon: 'inscripcion', inscripcion: ObjectId, mes: Date }
+export type MovimientoClaseSueltaMongo = MovimientoBase & { razon: 'clase suelta', alumne: ObjectId, taller: ObjectId }
+export type MovimientoLiquidacionProfeMongo = MovimientoBase & { razon: 'liquidacion profe', taller: ObjectId, mes: Date }
+
+export type MovimientoInscripcionPost = MovimientoBase & { razon: 'inscripcion', inscripcion: MongoId, mes: Date }
+export type MovimientoClaseSueltaPost = MovimientoBase & { razon: 'clase suelta', alumne: MongoId, taller: MongoId }
+export type MovimientoLiquidacionProfePost = MovimientoBase & { razon: 'liquidacion profe', taller: MongoId, mes: Date }
+
+export type Movimiento = { _id: MongoId } & (MovimientoGenerico | MovimientoInscripcion | MovimientoClaseSuelta | MovimientoLiquidacionProfe)
+export type MovimientoMongo = { _id: ObjectId } & (MovimientoGenerico | MovimientoInscripcionMongo | MovimientoClaseSueltaMongo | MovimientoLiquidacionProfeMongo)
+export type MovimientoPost = MovimientoGenerico | MovimientoInscripcionPost | MovimientoClaseSueltaPost | MovimientoLiquidacionProfePost
+export type MovimientoPut = { _id: MongoId, detalle: string }
+
 
 // Taller
 
-export type TallerMongo = {
-  _id: ObjectId
+export type TallerBase = {
   nombre: string,
   profe: string
   horarios: Horario[],
@@ -124,13 +107,10 @@ export type TallerMongo = {
   iniciado: Date
 }
 
-export type TallerPost = Omit<TallerMongo, '_id'>
-export type TallerPut = Partial<TallerMongo> & {_id: MongoId}
-
-export type Taller = Omit<TallerMongo, '_id' | 'inscripciones'> & {
-  _id: string,
-  inscripciones: Inscripcion[]
-}
+export type TallerMongo = TallerBase & { _id: ObjectId }
+export type TallerPost = TallerBase
+export type TallerPut = Partial<TallerBase> & { _id: MongoId }
+export type Taller = TallerBase & { _id: string, inscripciones: Inscripcion[] }
 
 
 // Asistencias
@@ -139,13 +119,16 @@ export type AsistenciaMongo = {
   _id: ObjectId,
   alumne: ObjectId,
   taller: ObjectId,
-  fecha: Date
+  fecha: Date,
+  horario: string
 }
 
-export type Asistencia = Omit<AsistenciaMongo, '_id' | 'alumne' | 'taller'> & {
-  _id: string,
-  alumne: Alumne,
-  taller: Taller
+export type Asistencia = {
+  _id: MongoId,
+  alumne: MongoId,
+  taller: MongoId,
+  fecha: Date,
+  horario: string
 }
 
 

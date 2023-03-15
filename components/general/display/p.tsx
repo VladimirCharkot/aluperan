@@ -1,0 +1,1 @@
+export const P = ({children}: {children: React.ReactNode}) => <p className="p-4">{children}</p>

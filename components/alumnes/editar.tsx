@@ -1,9 +1,9 @@
-import { Dispatch, SetStateAction, ChangeEventHandler, useState } from "react";
-import { TextInput } from "../general/textInput";
-import { Boton } from "../general/boton";
-import { ModalInscripcion } from "../general/modalInscripcion";
-import { Alumne} from "../../lib/api";
-import axios from 'axios';
+import { Dispatch, SetStateAction, ChangeEventHandler, useState, useEffect } from "react";
+import { TextInput } from "../general/input/textInput";
+import { Boton } from "../general/input/boton";
+import { ModalInscripcion } from "../general/modales/modalInscripcion";
+import { Alumne } from "../../lib/api";
+import { useBackend } from "../context/backend";
 
 export type Handler = ChangeEventHandler<HTMLInputElement>
 interface EditarAlumneProps {
@@ -13,6 +13,8 @@ interface EditarAlumneProps {
 }
 
 export const EditarAlumne = ({ alumne, setAlum, setEditing }: EditarAlumneProps) => {
+
+  const { editarInscripcion, editarAlumne } = useBackend();
 
   const [inscribiendo, setInscribiendo] = useState<boolean>(false);
 
@@ -25,13 +27,15 @@ export const EditarAlumne = ({ alumne, setAlum, setEditing }: EditarAlumneProps)
     inscripciones: a.inscripciones.filter(i => i._id != inscr)
   }))
 
-  const baja = (id: string) => axios.put('/api/inscripciones', { _id: id, activa: false }).then(
-    r => { if (r.status == 200) deleteInscripcion(id) }
-  )
+  const baja = (id: string) => editarInscripcion({ _id: id, activa: false }).then(() => {
+    deleteInscripcion(id) 
+  });
 
-  const update = () => {console.log("Enviando..."); console.log(alumne); axios.put('/api/alumnes', alumne).then(
-    r => { console.log(r); setEditing(false); }
-  )}
+  const update = () => {editarAlumne(alumne).then(() => setEditing(false) )}
+
+  useEffect(() => {
+    console.log(alumne)
+  }, [alumne])
 
   return (
     <>
@@ -41,8 +45,6 @@ export const EditarAlumne = ({ alumne, setAlum, setEditing }: EditarAlumneProps)
       <input className="text-2xl bg-transparent border-b outline-none" value={alumne.nombre} onChange={updateNombre} />
 
       <hr />
-
-      <div className="invisible bg-indigo-200 border-indigo-300 bg-red-200 border-red-300 bg-emerald-200 border-emerald-300"></div>
 
       <div className="grid grid-cols-2 gap-2 my-3">
         <p>Celular:</p>

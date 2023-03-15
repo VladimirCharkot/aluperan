@@ -1,15 +1,14 @@
 import { ObjectId } from "mongodb";
 import clientPromise from "./mongodb";
-import { Alumne, Taller, Inscripcion, EditarInscripcion, InscripcionPost } from "./api";
+import { Alumne, Taller, Inscripcion, InscripcionPut, InscripcionPost, InscripcionMongo } from "./api";
 import { last, pick } from "lodash";
 
-
-export const get_inscripciones = async () => {
+export const get_inscripciones = async (): Promise<Inscripcion[]> => {
   const client = await clientPromise;
   const db = client.db("aluperan_test");
 
   const inscripciones = await db
-    .collection<Inscripcion>("inscripciones")
+    .collection<InscripcionMongo>("inscripciones")
     .aggregate([
       {
         $lookup: {
@@ -46,7 +45,7 @@ export const get_inscripciones = async () => {
       }
 
     ])
-    .toArray();
+    .toArray() as Inscripcion[];
 
   return inscripciones
 }
@@ -72,12 +71,11 @@ export const post_inscripcion = async (inscripcion: InscripcionPost) => {
 
   const r = await db.collection('inscripciones').insertOne(insc)
 
-  
-  return {...insc, _id: r.insertedId} 
+  return {...insc, _id: r.insertedId, taller, alumne} 
 }
 
 
-export const put_inscripcion = async (update: EditarInscripcion) => {
+export const put_inscripcion = async (update: InscripcionPut) => {
   const client = await clientPromise;
   const db = client.db("aluperan_test")
   const ins = db.collection('inscripciones')

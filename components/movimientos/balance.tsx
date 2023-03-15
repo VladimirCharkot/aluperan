@@ -1,9 +1,9 @@
-import { capitalize } from "lodash";
-import { Movimiento } from "../../lib/api";
+import { capitalize, sortBy } from "lodash";
+import { MovimientoBase } from "../../lib/api";
 import { format_curr } from "../../lib/utils";
 
 export interface CartaBalanceProps {
-  movimientos: Movimiento[]
+  movimientos: MovimientoBase[]
 }
 
 export const CartaBalance = ({ movimientos }: CartaBalanceProps) => {
@@ -18,7 +18,7 @@ export const CartaBalance = ({ movimientos }: CartaBalanceProps) => {
         <Header>Balance</Header>
         <div className="col-span-3 text-2xl">Detalle</div>
 
-        {movimientos.map((m, i) =>
+        {sortBy(movimientos, m => m.fecha).map((m, i) =>
         (<>
           <div>{new Date(m.fecha).toLocaleDateString('es-ES')}</div>
           <div>{capitalize(m.medio)}</div>

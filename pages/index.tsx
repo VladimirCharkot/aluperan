@@ -10,7 +10,7 @@ import { get_alumnes } from '../lib/alumnes'
 import { get_inscripciones } from '../lib/inscripciones'
 import { AlmacenMovimientos } from '../lib/movimientos'
 import { get_talleres } from '../lib/talleres'
-import { Alumne, Inscripcion, Movimiento, Taller } from '../lib/api'
+import { Alumne, Asistencia, Inscripcion, Movimiento, Taller } from '../lib/api'
 import { AppContext } from '../components/context'
 
 export async function getServerSideProps() {
@@ -20,12 +20,13 @@ export async function getServerSideProps() {
       alums: serialize(await get_alumnes()),
       inscs: serialize(await get_inscripciones()),
       movs: serialize(await movimientos.get()),
-      talls: serialize(await get_talleres())
+      talls: serialize(await get_talleres()),
+      asts: []
     }
   }
 }
 
-export default function Home({ alums, inscs, talls, movs }: any) {
+export default function Home({ alums, inscs, talls, movs, asts }: any) {
   const [pagina, setPagina] = useState('alumnes')
   const NavLink = ({ addr }: any) => <p className='text-lg my-2 cursor-pointer' onClick={() => setPagina(addr)}>{capitalize(addr)}</p>
 
@@ -33,16 +34,19 @@ export default function Home({ alums, inscs, talls, movs }: any) {
   const [inscripciones, setInscripciones] = useState<Inscripcion[]>(inscs)
   const [talleres, setTalleres] = useState<Taller[]>(talls)
   const [movimientos, setMovimientos] = useState<Movimiento[]>(movs)
+  const [asistencias, setAsistencias] = useState<Asistencia[]>(asts)
 
   const ctx = {
     alumnes, setAlumnes,
     inscripciones, setInscripciones,
     talleres, setTalleres,
-    movimientos, setMovimientos
+    movimientos, setMovimientos,
+    asistencias, setAsistencias
   }
 
   return (
     <AppContext.Provider value={ctx}>
+      <div className="invisible bg-gray-200 bg-indigo-200 bg-indigo-300 border-indigo-300 border-indigo-400 border-indigo-600  bg-red-200 border-red-300 border-red-400 bg-emerald-200 border-emerald-300 border-emerald-400"></div>
       <div className="container">
         <Head>
           <title>Aluperán</title>
@@ -57,10 +61,10 @@ export default function Home({ alums, inscs, talls, movs }: any) {
             <NavLink addr='movimientos' />
             <div className='alupe w-full h-32 mt-auto'></div>
           </div>
-          {pagina == 'alumnes' && <Alumnes alumnes={alumnes} />}
-          {pagina == 'talleres' && <Talleres talleres={talleres} />}
-          {pagina == 'inscripciones' && <Inscripciones inscripciones={inscripciones} />}
-          {pagina == 'movimientos' && <Movimientos movimientos={movimientos} />}
+          {pagina == 'alumnes' && <Alumnes />}
+          {pagina == 'talleres' && <Talleres />}
+          {pagina == 'inscripciones' && <Inscripciones />}
+          {pagina == 'movimientos' && <Movimientos  />}
         </div>
       </div>
     </AppContext.Provider>

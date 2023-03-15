@@ -3,9 +3,9 @@ import { Alumne } from "../../lib/api";
 import { InfoAlumne } from "./info";
 import { EditarAlumne } from "./editar";
 
-import { Carta } from "../general/carta";
-import { Controles } from "../general/controles";
-import { Boton } from "../general/boton";
+import { Carta } from "../general/display/carta";
+import { Controles } from "../general/display/controles";
+import { Boton } from "../general/input/boton";
 
 interface AlumneProps {
   alumne: Alumne

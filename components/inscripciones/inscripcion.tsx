@@ -3,10 +3,10 @@ import { last } from "lodash";
 import { Inscripcion, MovimientoMongo } from "../../lib/api";
 import { balance_inscripcion, format_curr } from "../../lib/utils";
 import { CartaBalance } from "../movimientos/balance";
-import { Status } from "../general/status";
-import { Boton } from "../general/boton";
-import { ModalNuevoPagoInscripcion } from "../general/modalNuevoPagoInscripcion";
-import { Controles } from "../general/controles";
+import { Status } from "../general/display/status";
+import { Boton } from "../general/input/boton";
+import { ModalNuevoPagoInscripcion } from "../general/modales/modalNuevoPagoInscripcion";
+import { Controles } from "../general/display/controles";
 
 interface CartaInscripcionProps {
   inscripcion: Inscripcion
@@ -15,7 +15,7 @@ interface CartaInscripcionProps {
 export const CartaInscripcion = ({ inscripcion }: CartaInscripcionProps) => {
   const [ingresandoPago, setIngresandoPago] = useState(false);
   const [viendoMovimientos, setViendoMovimientos] = useState(false);
-  const movimientos = balance_inscripcion(inscripcion);
+  // const movimientos = balance_inscripcion(inscripcion);
 
   return (
     <li className="inscripcion p-8 bg-white/50 rounded-md m-6 
@@ -39,13 +39,13 @@ export const CartaInscripcion = ({ inscripcion }: CartaInscripcionProps) => {
       <hr className="my-2" />
 
       {inscripcion.pagos && <>
-        <p className="px-2">{`Balance: ${format_curr(movimientos.reduce((total, m) => total + m.monto, 0))}`}</p>
-        {viendoMovimientos && <CartaBalance movimientos={movimientos as unknown as MovimientoMongo[]} />}
+        {/* <p className="px-2">{`Balance: ${format_curr(movimientos.reduce((total, m) => total + m.monto, 0))}`}</p> */}
+        {viendoMovimientos && <CartaBalance movimientos={inscripcion.pagos as unknown as MovimientoMongo[]} />}
       </>}
 
       <Controles>
-      <Boton addons="m-4" texto={viendoMovimientos ? "Ocultar balance" : "Ver balance"} color="indigo" onClick={() => setViendoMovimientos(!viendoMovimientos)}/>
-        <Boton addons="m-4" texto="Ingresar pago" color="emerald" onClick={() => setIngresandoPago(!ingresandoPago)}/>
+        <Boton addons="m-4" texto={viendoMovimientos ? "Ocultar pagos" : "Ver pagos"} color="indigo" onClick={() => setViendoMovimientos(!viendoMovimientos)} />
+        <Boton addons="m-4" texto="Ingresar pago" color="emerald" onClick={() => setIngresandoPago(!ingresandoPago)} />
         {ingresandoPago && <ModalNuevoPagoInscripcion cerrar={() => setIngresandoPago(false)} inscripcion={inscripcion} />}
       </Controles>
       <p className="text-xs">{inscripcion._id}</p>

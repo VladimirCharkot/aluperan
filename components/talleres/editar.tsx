@@ -4,9 +4,9 @@ import { dias, dias_semana } from "../../lib/utils"
 import { range } from "lodash"
 import axios from 'axios'
 
-import { ModalHorario } from "../general/modalHorarios"
-import { Boton } from "../general/boton"
-import { TextInput } from "../general/textInput"
+import { ModalHorario } from "../general/modales/modalHorarios"
+import { Boton } from "../general/input/boton"
+import { TextInput } from "../general/input/textInput"
 
 type Handler = ChangeEventHandler<HTMLInputElement>
 
@@ -74,7 +74,7 @@ export const EditarTaller = ({ taller, setTaller, setEditing }: EditarTallerProp
 
     <p className="text-xl mt-3">Alumnes:</p>
     {taller.inscripciones.map(i => <div key={i._id} className="flex flex-row items-center justify-between my-2">
-      <p>{i.alumne}</p>
+      <p>{i.alumne.nombre}</p>
       <Boton color="red" texto="Baja" onClick={() => baja(i._id)} />
     </div>)}
 

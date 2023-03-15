@@ -41,9 +41,7 @@ export const get_talleres = async () => {
       },
       {
         $project: {
-          nombre: 1, horarios: 1, precios: 1, profe: 1, iniciado: 1,
-          'inscripciones.alumne': '$inscripciones.alumne.nombre',
-          'inscripciones.iniciada': 1,
+          nombre: 1, horarios: 1, precios: 1, profe: 1, iniciado: 1, inscripciones: 1
         }
       },
       {
@@ -76,6 +74,8 @@ export const get_talleres = async () => {
     .toArray() as Taller[];
 
   talleres.forEach(t => {
+    // Filtramos inscripciones sin alumne (accidentes de DB)
+    t.inscripciones = t.inscripciones.filter(i => i.alumne) 
     if (isEmpty(t.inscripciones[0])) {
       t.inscripciones = []
     }
@@ -100,7 +100,7 @@ export const post_taller = async (taller: TallerPost) => {
     iniciado: taller.iniciado ?? new Date()
   })
 
-  return { ...taller, _id: r.insertedId }
+  return { ...taller, _id: r.insertedId, inscripciones: [] }
 }
 
 export const put_taller = async (updates: TallerPut) => {

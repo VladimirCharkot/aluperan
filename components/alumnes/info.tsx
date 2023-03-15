@@ -1,6 +1,6 @@
 import { Alumne } from "../../lib/api"
-import { Enumerador } from "../general/enumerador"
-import { Id } from "../general/id"
+import { Enumerador } from "../general/display/enumerador"
+import { Id } from "../general/display/id"
 
 interface AlumneInfoProps {
   alumne: Alumne

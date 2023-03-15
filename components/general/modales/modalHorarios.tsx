@@ -1,9 +1,9 @@
 import { ChangeEventHandler, Dispatch, SetStateAction, useState } from "react";
-import { Modal } from "./modal";
-import { Boton } from "./boton";
-import { dias, horarios } from "../../lib/utils";
+import { Modal } from "../display/modal";
+import { Boton } from "../input/boton";
+import { dias, horarios } from "../../../lib/utils";
 import { entries } from "lodash";
-import { Taller, DiaSemana } from "../../lib/api";
+import { Taller, DiaSemana } from "../../../lib/api";
 
 interface ModalHorarioProps{
   setTaller: Dispatch<SetStateAction<Taller>>,
@@ -26,11 +26,7 @@ export const ModalHorario = ({ setTaller, cerrar }: ModalHorarioProps) => {
   }
 
   return (
-    <Modal>
-      <div className='p-8 bg-white rounded-md m-6 border relative flex flex-col z-20'>
-
-        <p className='absolute top-0 right-0 text-2xl m-5 cursor-pointer' onClick={cerrar}>X</p>
-
+    <Modal cerrar={ cerrar }>
         <p className='p-4'>Día:</p>
         <select className='p-4' onChange={e => setDia(e.target.value)}>
           <option value={undefined}></option>
@@ -44,7 +40,6 @@ export const ModalHorario = ({ setTaller, cerrar }: ModalHorarioProps) => {
         </select>
 
         <Boton addons='ml-auto' texto='Agregar' color='emerald' onClick={agregarHorario} />
-      </div>
     </Modal>
   )
 }

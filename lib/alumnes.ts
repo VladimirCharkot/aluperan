@@ -1,5 +1,5 @@
 import clientPromise from "./mongodb";
-import { Alumne, AlumnePost, EditarAlumne } from "./api";
+import { Alumne, AlumnePost, AlumnePut } from "./api";
 import { pick, isEmpty } from "lodash";
 import { ObjectId } from "mongodb";
 
@@ -66,19 +66,17 @@ export const get_alumnes = async () => {
 
 
 
-export const post_alumne = async (alumne: AlumnePost) => {
+export const post_alumne = async (alumne: AlumnePost): Promise<Alumne> => {
   const client = await clientPromise;
   const alumnes = await client.db("aluperan_test").collection('alumnes');
-  const r = await alumnes.insertOne(pick(alumne, ['nombre', 'celular', 'email']))
-  return {...alumne, _id: r.insertedId}
+  const r = await alumnes.insertOne(alumne)
+  return {...alumne, _id: r.insertedId.toString(), inscripciones: [], pagos: []}
 }
 
 
-export const put_alumne = async (update: EditarAlumne) => {
+export const put_alumne = async (update: AlumnePut) => {
   const client = await clientPromise;
   const db = client.db("aluperan_test");
-
-  console.log(update)
 
   const r = await db.collection('alumnes').updateOne({ _id: new ObjectId(update._id) },
     {$set: pick(update, ['nombre', 'celular', 'email'])})

@@ -1,11 +1,11 @@
 import { useState } from "react";
 import { Taller } from "../../lib/api";
-import { Carta } from "../general/carta";
+import { Carta } from "../general/display/carta";
 import { InfoTaller } from './info';
 import { EditarTaller } from './editar';
 
-import { Controles } from "../general/controles";
-import { Boton } from "../general/boton";
+import { Controles } from "../general/display/controles";
+import { Boton } from "../general/input/boton";
 
 interface CartaTallerProps {
   taller: Taller

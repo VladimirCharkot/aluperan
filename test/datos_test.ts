@@ -2,12 +2,10 @@ import { Alumne, Taller, Movimiento, MovimientoInscripcion, InscripcionPost, Tal
 import { post_alumne } from '../lib/alumnes';
 import { post_taller } from '../lib/talleres';
 import { AlmacenMovimientos } from '../lib/movimientos';
-import { random, range, sample } from 'lodash';
+import { random, range, sample, uniqBy } from 'lodash';
 import { post_inscripcion } from '../lib/inscripciones';
 import { eachMonthOfInterval } from 'date-fns';
 import clientPromise from '../lib/mongodb';
-
-
 
 const talleres: TallerPost[] = [{
   nombre: 'Aro',
@@ -60,6 +58,21 @@ const talleres: TallerPost[] = [{
   }],
   precios: [1200, 3500],
   iniciado: new Date(2022, 8)
+}, {
+  nombre: 'Trapecio',
+  profe: 'Indra Jazmin',
+  horarios: [{
+    dia: 'mar',
+    hora: '20:00hs'
+  }, {
+    dia: 'jue',
+    hora: '20:00hs'
+  },{
+    dia: 'sab',
+    hora: '12:00hs'
+  }],
+  precios: [1400, 4000, 5000, 6000],
+  iniciado: new Date(2022, 6)
 }]
 
 const alumnes: AlumnePost[] = [{
@@ -109,19 +122,24 @@ const carga = async () => {
   console.log('Insertando alumnes...')
   const alumnes_insertados = await Promise.all(alumnes.map(post_alumne))
   console.log(alumnes_insertados)
-  
-  console.log('Insertando inscripciones...')
-  const inscripciones_insertadas = await Promise.all(range(20).map(async () => {
+
+  const inscripciones_al_azar = range(20).map(() => {
     const alumne = sample(alumnes_insertados)!
     const taller = sample(talleres_insertados)!
     const fecha = fecha_random(taller.iniciado)
-    console.log(`Insertando inscripcion con fecha ${fecha}`)
-    return await post_inscripcion({
+    return {
       alumne: alumne._id.toString(),
       taller: taller._id.toString(),
       dias: random(taller.horarios.length - 1) + 1,
       iniciada: fecha
-    })
+    }
+  })
+
+  const inscripciones_a_insertar = uniqBy(inscripciones_al_azar, i => i.alumne + i.taller)
+
+  console.log('Insertando inscripciones...')
+  const inscripciones_insertadas = await Promise.all(inscripciones_a_insertar.map(async (insc) => {
+    return await post_inscripcion(insc)
   }))
   console.log(inscripciones_insertadas)
 
@@ -129,19 +147,23 @@ const carga = async () => {
   const movimientos_insertados = await Promise.all(inscripciones_insertadas.map(
     i => Promise.all(
       eachMonthOfInterval({ start: i.iniciada, end: new Date() }).map(d => {
-      console.log(`Generando movimiento del ${d.toLocaleDateString('es-ES')} para inscripción iniciada el ${i.iniciada.toLocaleDateString('es-ES')}`)
-      if (Math.random() < 0.9)
-        return movimientos.insertarPagoInscripcion({
-          monto: i.tarifas[0].monto!,
-          medio: sample(['tarjeta', 'efectivo', 'mercadopago'])!,
-          fecha: d,
-          razon: 'inscripcion',
-          inscripcion: i._id.toString()
-        })
-    }))
+        console.log(`Generando movimiento del ${d.toLocaleDateString('es-ES')} para inscripción iniciada el ${i.iniciada.toLocaleDateString('es-ES')}`)
+        if (Math.random() < 0.9){
+          const f = new Date(d.getTime() + Math.random() * 7 * 24 * 60 * 60 * 1000)
+          return movimientos.insertarPagoInscripcion({
+            monto: i.tarifas[0].monto!,
+            medio: sample(['tarjeta', 'efectivo', 'mercadopago'])!,
+            fecha: f, // una semana de rango
+            razon: 'inscripcion',
+            inscripcion: i._id.toString(),
+            mes: f,
+            detalle: ''
+          })
+        }
+      }))
   ))
 
-  return {movimientos_insertados, inscripciones_insertadas, talleres_insertados, alumnes_insertados}
+  return { movimientos_insertados, inscripciones_insertadas, talleres_insertados, alumnes_insertados }
 
 }
 
