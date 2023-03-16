@@ -79,7 +79,7 @@ const PagosEsteMes = ({ alumnes }: PagosEsteMesProps) => {
           <p className="text-sm">{a.nombre}</p>
           <p className="text-sm">{a.pago ? `$${a.pago.monto}` : "$0"}</p>
           <p className="text-sm">{a.pago ? capitalize(a.pago.medio) : "-"}</p>
-          <p className="text-sm">{a.pago ? new Date(a.pago.fecha).toLocaleDateString() : "-"}</p>
+          <p className="text-sm">{a.pago ? new Date(a.pago.fecha).toLocaleDateString("es-ES") : "-"}</p>
         </>)}
       </div>}
     </>
