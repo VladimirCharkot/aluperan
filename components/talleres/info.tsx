@@ -7,7 +7,7 @@ import { dias, dias_semana, nombres_meses } from "../../lib/utils"
 import { Enumerador } from "../general/display/enumerador"
 import { Horario } from "../../lib/api"
 import { AppContext } from "../context"
-import { addMonths, endOfMonth, isAfter, isBefore, isEqual, startOfMonth } from "date-fns"
+import { addMonths, endOfMonth, isAfter, isBefore, isEqual, isSameMonth, startOfMonth } from "date-fns"
 import { Boton } from "../general/input/boton"
 
 import axios from "axios";
@@ -141,8 +141,10 @@ const LiquidacionMesPasado = ({ taller }: LiquidacionMesPasadoProps) => {
     })
     const total_recaudado_mes = pagos_mes.reduce((s, c) => s + c.monto, 0)
 
-    const liquidaciones_este_taller = movimientos.filter(m => m.razon == "liquidacion profe" && m.taller._id == taller._id)
-    const liquidacion_mes_pendiente = liquidaciones_este_taller.filter(m => m.razon == "liquidacion profe" && isEqual(new Date(m.mes), inicio_mes)).length == 0
+    console.log(movimientos)
+    const liquidaciones_este_taller = movimientos.filter(m => m.razon == "liquidacion profe" && m.taller == taller._id)
+    console.log(liquidaciones_este_taller)
+    const liquidacion_mes_pendiente = liquidaciones_este_taller.filter(m => m.razon == "liquidacion profe" && isSameMonth(new Date(m.mes), inicio_mes_pasado)).length == 0
 
     return {
       total: total_recaudado_mes,

@@ -81,7 +81,7 @@ export type MovimientoGenerico = MovimientoBase & { razon: 'otra' }
 
 export type MovimientoInscripcion = MovimientoBase & { razon: 'inscripcion', inscripcion: Inscripcion, mes: Date }
 export type MovimientoClaseSuelta = MovimientoBase & { razon: 'clase suelta', alumne: Alumne, taller: Taller }
-export type MovimientoLiquidacionProfe = MovimientoBase & { razon: 'liquidacion profe', taller: Taller, mes: Date }
+export type MovimientoLiquidacionProfe = MovimientoBase & { razon: 'liquidacion profe', taller: MongoId, mes: Date }
 
 export type MovimientoInscripcionMongo = MovimientoBase & { razon: 'inscripcion', inscripcion: ObjectId, mes: Date }
 export type MovimientoClaseSueltaMongo = MovimientoBase & { razon: 'clase suelta', alumne: ObjectId, taller: ObjectId }
