@@ -11,6 +11,7 @@ import { Carta } from "../general/display/carta";
 import { Boton } from "../general/input/boton";
 import { AppContext } from "../context";
 import { Select } from "../general/input/select";
+import { P } from "../general/display/p";
 
 interface MovimientosProps {
   movimientos: Movimiento[]
@@ -25,6 +26,8 @@ export default function Movimientos() {
   const [hasta, setHasta] = useState(endOfMonth(new Date()))
   const [medio, setMedio] = useState('todos')
   const [direccion, setDireccion] = useState('ambas')
+
+  const total_en_caja = movimientos.reduce((prev, curr) => prev + curr.monto, 0)
 
   const opcs_direccion = [
     {v: 'ambas', txt: 'Todas'},
@@ -104,15 +107,16 @@ export default function Movimientos() {
   return (
     <Lista titulo="Movimientos" bg="grilla">
       <div className="mx-6 flex justify-between w-72">
-        <div><p>Desde:</p><input type="date" value={desde.toISOString().split("T")[0]} onChange={e => setDesde(new Date(e.target.value))} /></div>
-        <div><p>Hasta:</p><input type="date" value={hasta.toISOString().split("T")[0]} onChange={e => setHasta(new Date(e.target.value))} /></div>
-        <Select opts={opcs_medios} onChange={e => setMedio(e.target.value)} />
-        <Select opts={opcs_direccion} onChange={e => setDireccion(e.target.value)} />
+        <div className="mx-2"><p>Desde:</p><input type="date" value={desde.toISOString().split("T")[0]} onChange={e => setDesde(new Date(e.target.value))} /></div>
+        <div className="mx-2"><p>Hasta:</p><input type="date" value={hasta.toISOString().split("T")[0]} onChange={e => setHasta(new Date(e.target.value))} /></div>
+        <div className="mx-2"><p>Medios:</p><Select opts={opcs_medios} onChange={e => setMedio(e.target.value)} /></div>
+        <div className="mx-2"><p>Dirección:</p><Select opts={opcs_direccion} onChange={e => setDireccion(e.target.value)} /></div>
       </div>
       {ingresando && <ModalMovimiento cerrar={() => setIngresando(false)} />}
       <Carta>
         <Boton texto="Ingresar" color="indigo" onClick={() => setIngresando(true)} />
         <CartaBalance movimientos={movimientos_en_rango} />
+        <P>Total en caja: ${total_en_caja}</P>
       </Carta>
     </Lista>
   );
