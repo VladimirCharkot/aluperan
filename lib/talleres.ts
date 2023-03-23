@@ -30,7 +30,8 @@ export const get_talleres = async () => {
           from: "alumnes",
           localField: "inscripciones.alumne",
           foreignField: "_id",
-          as: "inscripciones.alumne"
+          as: "inscripciones.alumne",
+          pipeline: [{ $match: {$or: [{ activo: true }, { activo: undefined }]} }]
         }
       },
       {
@@ -89,23 +90,25 @@ export const post_taller = async (taller: TallerPost) => {
   const client = await clientPromise;
   const db = client.db("aluperan_test");
 
-  console.log(`Insertando taller:`)
-  console.log({
-    ...pick(taller, ['nombre', 'precios', 'profe', 'horarios', 'iniciado']),
-    iniciado: taller.iniciado ?? new Date()
-  })
-
   const r = await db.collection('talleres').insertOne({
     ...pick(taller, ['nombre', 'precios', 'profe', 'horarios', 'iniciado']),
-    iniciado: taller.iniciado ?? new Date()
+    iniciado: taller.iniciado ?? new Date(),
+    activo: true
   })
 
-  return { ...taller, _id: r.insertedId, inscripciones: [] }
+  return { ...taller, _id: r.insertedId, activo: true, inscripciones: [] }
 }
 
 export const put_taller = async (updates: TallerPut) => {
   const client = await clientPromise;
   const db = client.db("aluperan_test");
-  const r = await db.collection('talleres').updateOne({ _id: new ObjectId(updates._id) }, { $set: pick(updates, ['nombre', 'precios', 'profe', 'horarios']) })
+  const r = await db.collection('talleres').updateOne({ _id: new ObjectId(updates._id) }, { $set: pick(updates, ['nombre', 'precios', 'profe', 'horarios', 'activo']) })
+
+  // Si se da de baja desactivamos también sus inscripciones
+  if (updates.activo == false){
+    await db.collection('inscripciones').updateMany({ taller: new ObjectId(updates._id) },
+    {$set: {activa: false, baja: new Date()}})
+  }
+
   return r.acknowledged
 }

@@ -1,8 +1,8 @@
 import { Dispatch, SetStateAction, useContext } from 'react';
 import axios from 'axios';
-import { find, uniqBy } from 'lodash';
+import { find } from 'lodash';
 
-import { Alumne, AlumnePost, Asistencia, AsistenciaMongo, Inscripcion, MongoId, Movimiento } from '../../lib/api';
+import { Alumne, AlumnePost, Asistencia, Inscripcion, MongoId, Movimiento } from '../../lib/api';
 import { AppContext } from '.';
 
 export const useBackend = () => {
@@ -80,14 +80,14 @@ export const useBackend = () => {
     }
 
   const editarElem = <T>(endpoint: string, updater: ElemUpdater<T>) => 
-    async (edit: Elem<Partial<T>>, upd: Updater<T> = e => e) => {
+    async (edit: Elem<Partial<T>>) => {
       console.log('-------------------')
       console.log(`PUT ${endpoint}:`)
       console.log(edit)
       const r = await axios.put(endpoint, edit)
       console.log(r.data)
       console.log('-------------------')
-      if(r.status == 200){ updater(edit._id, upd) } 
+      if(r.status == 200){ updater(edit._id, a => ({...a, ...edit})) } 
       // else flash msg
     }
 

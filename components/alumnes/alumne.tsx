@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Alumne } from "../../lib/api";
 import { InfoAlumne } from "./info";
 import { EditarAlumne } from "./editar";
@@ -14,6 +14,10 @@ interface AlumneProps {
 export const CartaAlumne = ({ alumne }: AlumneProps) => {
   const [editing, setEditing] = useState(false);
   const [alum, setAlum] = useState(alumne);
+  useEffect(() => {
+    setAlum(alumne)
+  }, [alumne])
+  
 
   return (<Carta>
     {!editing && <InfoAlumne alumne={alum} />}

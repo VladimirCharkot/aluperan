@@ -91,7 +91,7 @@ export class AlmacenMovimientos {
       detalle: `Liquidación ${nombres_meses[new Date(movimiento.mes).getMonth()]} para ${taller!.nombre}`
     }
     const r = await this.db.collection('movimientos').insertOne(mov)
-    return { ...mov, _id: r.insertedId, taller }
+    return { ...mov, _id: r.insertedId }
   }
 
   async insertarGenerico(movimiento: MovimientoPost) {

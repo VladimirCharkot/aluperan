@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Taller } from "../../lib/api";
 import { Carta } from "../general/display/carta";
 import { InfoTaller } from './info';
@@ -15,6 +15,10 @@ export const CartaTaller = ({ taller }: CartaTallerProps) => {
 
   const [editing, setEditing] = useState(false);
   const [tall, setTall] = useState(taller);
+
+  useEffect(() => {
+    setTall(tall)
+  }, [taller])
 
   return (
     <Carta>

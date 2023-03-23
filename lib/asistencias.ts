@@ -1,6 +1,6 @@
 import clientPromise from "./mongodb";
 import { ObjectId } from "mongodb";
-import { AsistenciaMongo } from "./api";
+import { Asistencia, AsistenciaMongo, AsistenciaPost } from "./api";
 import { startOfMonth, endOfMonth, isAfter, isBefore, isEqual } from "date-fns";
 
 
@@ -30,18 +30,19 @@ export const get_asistencias = async (taller: string, mes?: Date) => {
   return asistencias
 }
 
-export const post_asistencias = async (asistencias: AsistenciaMongo[]) => {
+export const post_asistencias = async (asistencias: AsistenciaPost[]) => {
   const client = await clientPromise;
   const db = client.db("aluperan_test");
 
-  let insertadas = []
+  let insertadas: AsistenciaMongo[] = []
   for (const asistencia of asistencias) {
-    const r = await db.collection('asistencias').insertOne({
+    const doc = {
       ...asistencia,
       alumne: new ObjectId(asistencia.alumne),
       taller: new ObjectId(asistencia.taller)
-    })
-    insertadas.push({ ...asistencia, _id: r.insertedId });
+    }
+    const r = await db.collection('asistencias').insertOne(doc)
+    insertadas.push({ ...doc, _id: r.insertedId });
   }
 
   return insertadas

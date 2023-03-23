@@ -93,7 +93,6 @@ interface AsistenciasProps {
   taller: Taller
 }
 
-
 const Asistencias = ({ taller }: AsistenciasProps) => {
   const { asistencias, traerAsistencias } = useBackend();
 
@@ -126,11 +125,12 @@ interface LiquidacionMesPasadoProps {
 
 const LiquidacionMesPasado = ({ taller }: LiquidacionMesPasadoProps) => {
 
-  const { movimientos, setMovimientos, inscripciones } = useContext(AppContext);
+  const { inscripciones, movimientos, crearMovimiento } = useBackend()
 
   const balance_liquidacion = (mes: Date) => {
     const inicio_mes = startOfMonth(mes)
     const fin_mes = endOfMonth(mes)
+    console.log(`Calculando balance entre ${inicio_mes.toLocaleDateString('es-ES')} y ${fin_mes.toLocaleDateString('es-ES')}...`)
 
     const inscripciones_este_taller = inscripciones.filter(i => i.activa && i.taller._id == taller._id)
     const pagos_este_taller = flatten(inscripciones_este_taller.map(i => i.pagos))
@@ -141,10 +141,13 @@ const LiquidacionMesPasado = ({ taller }: LiquidacionMesPasadoProps) => {
     })
     const total_recaudado_mes = pagos_mes.reduce((s, c) => s + c.monto, 0)
 
-    console.log(movimientos)
+    //@ts-ignore
     const liquidaciones_este_taller = movimientos.filter(m => m.razon == "liquidacion profe" && m.taller == taller._id)
-    console.log(liquidaciones_este_taller)
     const liquidacion_mes_pendiente = liquidaciones_este_taller.filter(m => m.razon == "liquidacion profe" && isSameMonth(new Date(m.mes), inicio_mes_pasado)).length == 0
+    console.log(`Liquidaciones para ${taller.nombre}...`)
+    console.log(liquidaciones_este_taller)
+
+    console.log(`Pendiente? ${liquidacion_mes_pendiente}`)
 
     return {
       total: total_recaudado_mes,
@@ -156,6 +159,7 @@ const LiquidacionMesPasado = ({ taller }: LiquidacionMesPasadoProps) => {
 
 
   const liquidar = () => {
+    console.log(`Liquidando...`)
     const liquidacion: MovimientoLiquidacionProfePost = {
       monto: -a_liquidar_profe,
       medio: "efectivo",
@@ -165,10 +169,7 @@ const LiquidacionMesPasado = ({ taller }: LiquidacionMesPasadoProps) => {
       mes: inicio_mes_pasado,
       detalle: `Liquidación ${taller.profe}`
     }
-
-    axios.post("/api/movimientos", liquidacion).then(r => {
-      setMovimientos(ms => [...ms, r.data])
-    })
+    crearMovimiento(liquidacion)
   }
 
 

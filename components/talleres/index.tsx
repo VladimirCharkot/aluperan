@@ -6,6 +6,7 @@ import { Boton } from "../general/input/boton";
 import { ModalNuevoTaller } from "../general/modales/modalNuevoTaller";
 import { AppContext } from "../context";
 import { FlexR } from "../general/display/flexR";
+import { sortBy } from "lodash";
 
 export default function Talleres() {
   const { talleres } = useContext(AppContext);
@@ -16,7 +17,9 @@ export default function Talleres() {
   const cerrarModal = () => setAgregando(false)
   const abrirModal = () => setAgregando(true)
 
-  const talleres_mostrados = talleres.filter(t => t.nombre.toLowerCase().includes(filtro.toLowerCase()) || t.profe.toLowerCase().includes(filtro.toLowerCase()))
+  const talleres_mostrados = sortBy(talleres
+    .filter(t => t.nombre.toLowerCase().includes(filtro.toLowerCase()) || t.profe.toLowerCase().includes(filtro.toLowerCase()))
+    .filter(t => t.activo !== false), t => t.nombre)
 
   return (
     <Lista titulo="Talleres" bg="burbujas" >

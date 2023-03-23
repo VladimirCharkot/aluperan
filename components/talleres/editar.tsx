@@ -1,5 +1,5 @@
-import { Dispatch, SetStateAction, ChangeEventHandler, useState } from "react"
-import { Taller, Horario } from "../../lib/api"
+import { Dispatch, SetStateAction, ChangeEventHandler, useState, useEffect } from "react"
+import { Taller } from "../../lib/api"
 import { dias, dias_semana } from "../../lib/utils"
 import { range } from "lodash"
 import axios from 'axios'
@@ -7,6 +7,10 @@ import axios from 'axios'
 import { ModalHorario } from "../general/modales/modalHorarios"
 import { Boton } from "../general/input/boton"
 import { TextInput } from "../general/input/textInput"
+import { TituloInput } from "../general/input/tituloInput"
+import { useBackend } from "../context/backend"
+import { ModalConfirmarBaja } from "../general/modales/modalConfirmarBaja"
+import { FlexR } from "../general/display/flexR"
 
 type Handler = ChangeEventHandler<HTMLInputElement>
 
@@ -19,6 +23,10 @@ interface EditarTallerProps {
 export const EditarTaller = ({ taller, setTaller, setEditing }: EditarTallerProps) => {
 
   const [agregandoHorario, setAgregandoHorario] = useState(false);
+  const [bajandoTaller, setBajandoTaller] = useState<boolean>(false);
+  const [bajaConfirmada, setBajaConfirmada] = useState<boolean>(false);
+
+  const { editarTaller } = useBackend()
 
   const updateNombre: Handler = e => setTaller(t => ({ ...t, nombre: e.target.value }))
   const updateProfe: Handler = e => setTaller(t => ({ ...t, profe: e.target.value }))
@@ -43,12 +51,20 @@ export const EditarTaller = ({ taller, setTaller, setEditing }: EditarTallerProp
     r => { setEditing(false); }
   )
 
+  useEffect(() => {
+    if (bajaConfirmada) editarTaller({_id: taller._id, activo: false}) 
+  }, [bajaConfirmada])
+
   return (<>
 
     {agregandoHorario && <ModalHorario setTaller={setTaller} cerrar={() => setAgregandoHorario(false)} />}
-
-    <input className="text-2xl bg-transparent border-b outline-none" value={taller.nombre} onChange={updateNombre} />
-
+    {bajandoTaller && <ModalConfirmarBaja nombre={taller.nombre} tipo="taller" cerrar={() => setBajandoTaller(false)} setConfirmado={setBajaConfirmada}/>}
+    
+    <FlexR justify="between">
+      <TituloInput txt={taller.nombre} handler={updateNombre}/>
+      <Boton texto="Dar de baja" color="red" onClick={() => setBajandoTaller(true)}/>
+    </FlexR>
+    
     <hr />
 
     <div className="grid grid-cols-2 gap-2 my-3">

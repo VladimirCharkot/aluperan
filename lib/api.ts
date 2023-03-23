@@ -18,12 +18,13 @@ export type MongoId = string
 export type AlumneBase = {
   nombre: string,
   celular?: string,
-  email?: string
+  email?: string,
+  activo: boolean
 }
 
 export type AlumneMongo = AlumneBase & { _id: ObjectId }
 export type AlumnePut = Partial<AlumneBase> & { _id: MongoId }
-export type AlumnePost = AlumneBase 
+export type AlumnePost = Omit<AlumneBase, 'activo'> 
 export type Alumne = AlumneBase & {
   _id: MongoId,
   inscripciones: Inscripcion[],
@@ -104,11 +105,12 @@ export type TallerBase = {
   profe: string
   horarios: Horario[],
   precios: number[]  // 0: clase suelta, 1: 1 día/sem, 2: 2 días/sem, etc,
-  iniciado: Date
+  iniciado: Date,
+  activo: boolean
 }
 
 export type TallerMongo = TallerBase & { _id: ObjectId }
-export type TallerPost = TallerBase
+export type TallerPost = Omit<TallerBase, 'activo'>
 export type TallerPut = Partial<TallerBase> & { _id: MongoId }
 export type Taller = TallerBase & { _id: string, inscripciones: Inscripcion[] }
 
@@ -130,6 +132,8 @@ export type Asistencia = {
   fecha: Date,
   horario: string
 }
+
+export type AsistenciaPost = Omit<Asistencia, '_id'>
 
 
 // Ayudines 

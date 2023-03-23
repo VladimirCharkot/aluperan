@@ -1,11 +1,13 @@
-import { Alumne, Taller, Movimiento, MovimientoInscripcion, InscripcionPost, TallerPost, AlumnePost, Inscripcion } from '../lib/api';
+import { Alumne, Taller, Movimiento, MovimientoInscripcion, InscripcionPost, TallerPost, AlumnePost, Inscripcion, Asistencia, AsistenciaPost } from '../lib/api';
 import { post_alumne } from '../lib/alumnes';
 import { post_taller } from '../lib/talleres';
 import { AlmacenMovimientos } from '../lib/movimientos';
-import { random, range, sample, uniqBy } from 'lodash';
+import { find, flatten, random, range, sample, uniqBy } from 'lodash';
 import { post_inscripcion } from '../lib/inscripciones';
-import { eachMonthOfInterval } from 'date-fns';
+import { eachDayOfInterval, eachMonthOfInterval } from 'date-fns';
 import clientPromise from '../lib/mongodb';
+import { dias_ids } from '../lib/utils';
+import { post_asistencias } from '../lib/asistencias';
 
 const talleres: TallerPost[] = [{
   nombre: 'Aro',
@@ -115,13 +117,28 @@ const fecha_random = (desde: Date) => {
 }
 
 const carga = async () => {
+  const client = await clientPromise
+
+  client.db('aluperan_test').collection('alumnes').drop()
+  client.db('aluperan_test').collection('asistencias').drop()
+  client.db('aluperan_test').collection('inscripciones').drop()
+  client.db('aluperan_test').collection('movimientos').drop()
+  client.db('aluperan_test').collection('talleres').drop()
+
+
+
   const movimientos = new AlmacenMovimientos(await clientPromise);
   console.log('Insertando talleres...')
   const talleres_insertados = await Promise.all(talleres.map(post_taller))
   console.log(talleres_insertados)
+
+
+
   console.log('Insertando alumnes...')
   const alumnes_insertados = await Promise.all(alumnes.map(post_alumne))
   console.log(alumnes_insertados)
+
+
 
   const inscripciones_al_azar = range(20).map(() => {
     const alumne = sample(alumnes_insertados)!
@@ -134,14 +151,34 @@ const carga = async () => {
       iniciada: fecha
     }
   })
-
   const inscripciones_a_insertar = uniqBy(inscripciones_al_azar, i => i.alumne + i.taller)
 
   console.log('Insertando inscripciones...')
-  const inscripciones_insertadas = await Promise.all(inscripciones_a_insertar.map(async (insc) => {
+  //@ts-ignore  pincha por tarfias
+  const inscripciones_insertadas: Inscripcion[] = await Promise.all(inscripciones_a_insertar.map(async (insc) => {
     return await post_inscripcion(insc)
   }))
   console.log(inscripciones_insertadas)
+
+
+  console.log('Insertando asistencias...')
+  const asistencias_a_insertar = flatten(inscripciones_insertadas.map( i => {
+    return eachDayOfInterval({ start: i.iniciada, end: new Date() }).map(d => {
+      const diaSemana = dias_ids[d.getDay()]
+      const h = find(i.taller!.horarios, h => h.dia == diaSemana)
+      if(h && Math.random() < 0.9){
+        return {
+          alumne: i.alumne?._id,
+          taller: i.taller?._id,
+          fecha: d,
+          horario: h.hora 
+        }
+      }
+    })
+  })).filter(a => a !== undefined) as AsistenciaPost[]
+
+  const asistencias_insertadas = await post_asistencias(asistencias_a_insertar.filter(a => a !== undefined))
+
 
   console.log('Insertando movimientos...')
   const movimientos_insertados = await Promise.all(inscripciones_insertadas.map(
@@ -160,10 +197,10 @@ const carga = async () => {
             detalle: ''
           })
         }
-      }))
+      }).filter(i => i !== undefined))
   ))
 
-  return { movimientos_insertados, inscripciones_insertadas, talleres_insertados, alumnes_insertados }
+  return { movimientos_insertados, inscripciones_insertadas, talleres_insertados, alumnes_insertados, asistencias_insertadas }
 
 }
 
@@ -177,5 +214,7 @@ carga().then(r => {
   console.log(r.inscripciones_insertadas)
   console.log('Movimientos:')
   console.log(r.movimientos_insertados)
+  console.log('Asistencias:')
+  console.log(r.asistencias_insertadas)
   process.exit()
 })

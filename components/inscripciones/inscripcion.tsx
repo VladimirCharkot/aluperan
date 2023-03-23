@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { last } from "lodash";
 import { Inscripcion, MovimientoMongo } from "../../lib/api";
 import { balance_inscripcion, format_curr } from "../../lib/utils";

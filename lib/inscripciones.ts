@@ -10,6 +10,7 @@ export const get_inscripciones = async (): Promise<Inscripcion[]> => {
   const inscripciones = await db
     .collection<InscripcionMongo>("inscripciones")
     .aggregate([
+      {$match: {activa: true}},
       {
         $lookup: {
           from: "talleres",

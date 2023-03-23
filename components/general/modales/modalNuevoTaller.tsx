@@ -22,13 +22,13 @@ interface ModalNuevoTallerProps {
 export type HandlerText = ChangeEventHandler<HTMLInputElement>
 export type HandlerSelect = ChangeEventHandler<HTMLSelectElement>
 
-const replaceAt = (arr: any[], i: number, repl: any) => [...arr.slice(0, i), repl, arr.slice(i + 1)]
+const replaceAt = (arr: any[], i: number, repl: any) => [...arr.slice(0, i), repl, ...arr.slice(i + 1)]
 
 export const ModalNuevoTaller = ({ cerrar }: ModalNuevoTallerProps) => {
 
   const { crearTaller } = useBackend();
 
-  const [taller, setTaller] = useState<Omit<TallerMongo, "_id">>({
+  const [taller, setTaller] = useState<Omit<TallerMongo, "_id" | "activo">>({
     nombre: '',
     profe: '',
     horarios: [],
