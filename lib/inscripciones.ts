@@ -72,7 +72,7 @@ export const post_inscripcion = async (inscripcion: InscripcionPost) => {
 
   const r = await db.collection('inscripciones').insertOne(insc)
 
-  return {...insc, _id: r.insertedId, taller, alumne} 
+  return {...insc, _id: r.insertedId, taller, alumne, pagos: []} 
 }
 
 
