@@ -5,7 +5,7 @@ import { last, pick } from "lodash";
 
 export const get_inscripciones = async (): Promise<Inscripcion[]> => {
   const client = await clientPromise;
-  const db = client.db("aluperan_test");
+  const db = client.db("aluperan");
 
   const inscripciones = await db
     .collection<InscripcionMongo>("inscripciones")
@@ -53,7 +53,7 @@ export const get_inscripciones = async (): Promise<Inscripcion[]> => {
 
 export const post_inscripcion = async (inscripcion: InscripcionPost) => {
   const client = await clientPromise;
-  const db = client.db("aluperan_test")
+  const db = client.db("aluperan")
 
   const alumne = await db.collection<Alumne>("alumnes").findOne({ _id: new ObjectId(inscripcion.alumne) as any })
   const taller = await db.collection<Taller>("talleres").findOne({ _id: new ObjectId(inscripcion.taller) as any })
@@ -78,7 +78,7 @@ export const post_inscripcion = async (inscripcion: InscripcionPost) => {
 
 export const put_inscripcion = async (update: InscripcionPut) => {
   const client = await clientPromise;
-  const db = client.db("aluperan_test")
+  const db = client.db("aluperan")
   const ins = db.collection('inscripciones')
 
   const _id = new ObjectId(update._id)

@@ -6,7 +6,7 @@ import { startOfMonth, endOfMonth, isAfter, isBefore, isEqual } from "date-fns";
 
 export const get_asistencias = async (taller: string, mes?: Date) => {
   const client = await clientPromise;
-  const db = client.db("aluperan_test");
+  const db = client.db("aluperan");
 
   let asistencias: AsistenciaMongo[] = []
   if (taller) {
@@ -32,7 +32,7 @@ export const get_asistencias = async (taller: string, mes?: Date) => {
 
 export const post_asistencias = async (asistencias: AsistenciaPost[]) => {
   const client = await clientPromise;
-  const db = client.db("aluperan_test");
+  const db = client.db("aluperan");
 
   let insertadas: AsistenciaMongo[] = []
   for (const asistencia of asistencias) {

@@ -5,7 +5,7 @@ import { ObjectId } from "mongodb";
 
 export const get_talleres = async () => {
   const client = await clientPromise;
-  const db = client.db("aluperan_test");
+  const db = client.db("aluperan");
 
   const talleres = await db
     .collection("talleres")
@@ -88,7 +88,7 @@ export const get_talleres = async () => {
 
 export const post_taller = async (taller: TallerPost) => {
   const client = await clientPromise;
-  const db = client.db("aluperan_test");
+  const db = client.db("aluperan");
 
   const r = await db.collection('talleres').insertOne({
     ...pick(taller, ['nombre', 'precios', 'profe', 'horarios', 'iniciado']),
@@ -101,7 +101,7 @@ export const post_taller = async (taller: TallerPost) => {
 
 export const put_taller = async (updates: TallerPut) => {
   const client = await clientPromise;
-  const db = client.db("aluperan_test");
+  const db = client.db("aluperan");
   const r = await db.collection('talleres').updateOne({ _id: new ObjectId(updates._id) }, { $set: pick(updates, ['nombre', 'precios', 'profe', 'horarios', 'activo']) })
 
   // Si se da de baja desactivamos también sus inscripciones

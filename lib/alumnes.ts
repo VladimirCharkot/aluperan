@@ -5,7 +5,7 @@ import { ObjectId } from "mongodb";
 
 export const get_alumnes = async () => {
   const client = await clientPromise;
-  const alumnes = await client.db("aluperan_test").collection('alumnes');
+  const alumnes = await client.db("aluperan").collection('alumnes');
 
   const alums = await alumnes
     .aggregate([
@@ -69,7 +69,7 @@ export const get_alumnes = async () => {
 
 export const post_alumne = async (alumne: AlumnePost): Promise<Alumne> => {
   const client = await clientPromise;
-  const alumnes = await client.db("aluperan_test").collection('alumnes');
+  const alumnes = await client.db("aluperan").collection('alumnes');
   const r = await alumnes.insertOne({...alumne, activo: true})
   return {...alumne, _id: r.insertedId.toString(), activo: true, inscripciones: [], pagos: []}
 }
@@ -77,7 +77,7 @@ export const post_alumne = async (alumne: AlumnePost): Promise<Alumne> => {
 
 export const put_alumne = async (update: AlumnePut) => {
   const client = await clientPromise;
-  const db = client.db("aluperan_test");
+  const db = client.db("aluperan");
 
   console.log(`Aplicando update...`)
   console.log(update)

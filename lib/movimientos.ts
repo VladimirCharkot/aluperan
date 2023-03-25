@@ -15,7 +15,7 @@ export class AlmacenMovimientos {
   }
 
   constructor(private client: MongoClient) {
-    this.db = this.client.db("aluperan_test")
+    this.db = this.client.db("aluperan")
   }
 
   async get() {
