@@ -4,12 +4,13 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "init_db" : "npx ts-node test/datos_test.ts"
+    "init_db": "npx ts-node test/datos_test.ts"
   },
   "dependencies": {
     "@types/axios": "^0.14.0",
     "axios": "^1.3.2",
     "date-fns": "^2.29.3",
+    "iron-session": "^6.3.1",
     "lodash": "^4.17.21",
     "mongodb": "^4.8.1",
     "next": "latest",
