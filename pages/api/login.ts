@@ -18,6 +18,8 @@ async function login(req: NextApiRequest, res: NextApiResponse) {
     res.json(user)
 
   } catch (error) {
+    console.log(`Error en login:`)
+    console.log((error as Error).message)
     res.status(500).json({ message: (error as Error).message })
   }
 }
