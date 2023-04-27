@@ -7,6 +7,7 @@ import { capitalize } from 'lodash';
 import { LoginContext } from "../components/loginContext"
 import Head from 'next/head'
 import { useBackend } from '../components/context/backend'
+import { ModalCambiarPass } from '../components/general/modales/modalCambiarPass'
 
 
 export default function Home() {
@@ -14,6 +15,7 @@ export default function Home() {
   const NavLink = ({ addr }: any) => <p className='text-lg my-2 cursor-pointer' onClick={() => setPagina(addr)}>{capitalize(addr)}</p>
 
   const { traerAlumnes, traerInscripciones, traerMovimientos, traerTalleres } = useBackend()
+  const [cambiandoPass, setCambiandoPass] = useState(false)
 
   useEffect(() => {
     traerAlumnes()
@@ -23,7 +25,6 @@ export default function Home() {
   }, [])
 
   const { loggedIn, setLoggedIn } = useContext(LoginContext)
-  useEffect(() => { console.log(`Login es: ${loggedIn}`) }, [])
   
   const logout = async () => {
     console.log(`Logout`)
@@ -40,7 +41,7 @@ export default function Home() {
       </Head>
       <div className="invisible bg-gray-200 bg-indigo-200 bg-indigo-300 border-indigo-300 border-indigo-400 border-indigo-600  bg-red-200 border-red-300 border-red-400 bg-emerald-200 border-emerald-300 border-emerald-400"></div>
       <div className="container">
-
+        {cambiandoPass && <ModalCambiarPass cerrar={() => setCambiandoPass(false)}/>}
         {!loggedIn && <p className='p-5'>No autorizado</p>}
         {loggedIn &&
           <div className='flex flex-row w-screen'>
@@ -49,7 +50,10 @@ export default function Home() {
               <NavLink addr='talleres' />
               <NavLink addr='inscripciones' />
               <NavLink addr='movimientos' />
-              <div className='alupe w-full h-32 mt-auto cursor-pointer' onClick={logout} />
+              <hr className='border-black my-5' />
+              <p className='text-lg my-2 cursor-pointer' onClick={() => setCambiandoPass(true)}>Cambiar Pass</p>
+              <p className='text-lg my-2 cursor-pointer' onClick={logout}>Salir</p>
+              <div className='alupe w-full h-32 mt-auto cursor-pointer'/>
             </div>
             {pagina == 'alumnes' && <Alumnes />}
             {pagina == 'talleres' && <Talleres />}

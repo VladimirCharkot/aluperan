@@ -1,0 +1,1 @@
+export const PSuccess = ({children}: {children: React.ReactNode}) => <p className="text-xs text-emerald-400">{children}</p>

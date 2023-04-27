@@ -1,27 +1,46 @@
 import { withIronSessionApiRoute } from 'iron-session/next'
 import { sessionOptions } from '../../lib/session'
 import { NextApiRequest, NextApiResponse } from "next"
+import { check_password, update_password } from '../../lib/password'
 
 async function login(req: NextApiRequest, res: NextApiResponse) {
-  try {
-    const { password } = await req.body
 
-    let user
-    if(password == 'ojota'){
-      user = { isLoggedIn: true }
-    }else{
-      user = { isLoggedIn: false }
+  if (req.method == 'POST') {
+    try {
+      const { password } = await req.body
+
+      let user
+      if (await check_password(password)) {
+        user = { isLoggedIn: true }
+      } else {
+        user = { isLoggedIn: false }
+      }
+
+      req.session.user = user
+      await req.session.save()
+      res.json(user)
+
+    } catch (error) {
+      console.log(`Error en login:`)
+      console.log((error as Error).message)
+      res.status(500).json({ ok: false, message: (error as Error).message })
     }
-
-    req.session.user = user
-    await req.session.save()
-    res.json(user)
-
-  } catch (error) {
-    console.log(`Error en login:`)
-    console.log((error as Error).message)
-    res.status(500).json({ message: (error as Error).message })
   }
+
+  if (req.method == 'PUT' && req.session.user && req.session.user.isLoggedIn) {
+    try {
+      const { new_password } = await req.body
+      await update_password(new_password)
+      res.json({ok: true})
+    } catch (e) {
+      console.log(`Error en password update:`)
+      console.log((e as Error).message)
+      res.status(500).json({ ok: false, message: (e as Error).message })
+    }
+  }
+
+  res.status(401).json({message: 'No autorizado'})
+
 }
 
 export default withIronSessionApiRoute(login, sessionOptions)
