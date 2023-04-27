@@ -37,9 +37,12 @@ async function login(req: NextApiRequest, res: NextApiResponse) {
       console.log((e as Error).message)
       res.status(500).json({ ok: false, message: (e as Error).message })
     }
+  }else{
+    res.status(401).json({message: 'No autorizado'})
   }
 
-  res.status(401).json({message: 'No autorizado'})
+  if(req.method != 'POST' && req.method != 'PUT') res.status(401).json({message: 'No autorizado'})
+
 
 }
 
