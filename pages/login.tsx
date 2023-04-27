@@ -1,9 +1,11 @@
 import React, { FormEventHandler, useContext, useEffect, useState } from 'react'
 import { LoginContext } from '../components/loginContext'
+import { Boton } from '../components/general/input/boton'
 
 export default function Login() {
 
   const { setLoggedIn } = useContext(LoginContext)
+  const [pass, setPass] = useState('')
   const [errorMsg, setErrorMsg] = useState('')
   const [successMsg, setSuccessMsg] = useState('')
 
@@ -11,11 +13,14 @@ export default function Login() {
 
   const handleSend: FormEventHandler<HTMLFormElement> = async (e) => {
     e.preventDefault()
+    login()
+  }
 
-    console.log(`Intentando Login password ${e.currentTarget.password.value}`)
+  const login = async () => {
+    console.log(`Intentando Login password ${pass}`)
 
     const body = {
-      password: e.currentTarget.password.value,
+      password: pass
     }
 
     try {
@@ -36,15 +41,14 @@ export default function Login() {
       setLoggedIn(false)
       setErrorMsg((e as Error).message)
     }
-
   }
 
   return (
     <>
-
       <div className="login flex items-center justify-center h-screen bg-indigo-200">
         <form onSubmit={handleSend}>
-          <input className="border p-2" type="password" name="password" />
+          <input className="border p-2" type="password" name="password" onChange={e => setPass(e.target.value)}/>
+          <Boton texto="Login" onClick={login} color="emerald" />
           <p className='text-red-400 p-2 text-sm'>{errorMsg}</p>
           <p className='text-emerald-400 p-2 text-sm'>{successMsg}</p>
         </form>
