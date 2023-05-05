@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { sortBy, uniq } from "lodash";
-import { addHours, startOfDay } from "date-fns";
 
 import { Modal } from "../display/modal"
 import { PError } from "../display/perror";
@@ -11,8 +10,8 @@ import { Boton } from "../input/boton";
 import { Check } from "../input/checkbox";
 import { Select } from "../input/select";
 
-import { dias, dias_ids, horarios } from "../../../lib/utils";
-import { Taller, DiaSemana, AsistenciaMongo, Asistencia } from "../../../lib/api";
+import { dias, dias_ids } from "../../../lib/utils";
+import { Taller, Asistencia } from "../../../lib/api";
 import { useBackend } from "../../context/backend";
 import { DatePick } from "../input/date";
 
@@ -23,8 +22,9 @@ interface ModalPasarListaProps {
 
 export const ModalPasarLista = ({ taller, cerrar }: ModalPasarListaProps) => {
   const [hoy, setHoy] = useState(true)
+  const { lkpInscripcionesTaller, lkpAlumneInscripcion } = useBackend()
 
-  const alumnes_taller = sortBy(uniq(taller.inscripciones.map(i => i.alumne)), a => a.nombre)
+  const nombres_alumnes_taller = sortBy(uniq(lkpInscripcionesTaller(taller).map(i => lkpAlumneInscripcion(i))), a => a.nombre)
   const toggleAsistencia = (_id: string) => {
     if (asistencias.includes(_id)) setAsistencias(asistencias.filter(id => id != _id))
     else setAsistencias([...asistencias, _id])
@@ -71,7 +71,7 @@ export const ModalPasarLista = ({ taller, cerrar }: ModalPasarListaProps) => {
       <Check checked={hoy} onClick={() => setHoy(!hoy)} />
     </FlexR>
 
-    {!hoy && <DatePick fecha={fecha} setFecha={setFecha} />}
+    {!hoy && <DatePick fecha={fecha} setFecha={setFecha} shiftHoras={3} />}
 
     <hr />
 
@@ -85,7 +85,7 @@ export const ModalPasarLista = ({ taller, cerrar }: ModalPasarListaProps) => {
 
     <P>{texto_fecha} asistieron:</P>
     <div>
-      {alumnes_taller.map(a =>
+      {nombres_alumnes_taller.map(a =>
         <FlexR key={a._id}>
           <Check checked={asistencias.includes(a._id)} onClick={() => toggleAsistencia(a._id)} />
           <P>{a.nombre}</P>

@@ -23,12 +23,16 @@ export type AlumneBase = {
 }
 
 export type AlumneMongo = AlumneBase & { _id: ObjectId }
+// export type AlumneCable = AlumneBase & { _id: MongoId }
 export type AlumnePut = Partial<AlumneBase> & { _id: MongoId }
-export type AlumnePost = Omit<AlumneBase, 'activo'> 
+export type AlumnePost = Omit<AlumneBase, 'activo'>
+export type AlumneDel = { _id: MongoId }
 export type Alumne = AlumneBase & {
   _id: MongoId,
-  inscripciones: Inscripcion[],
-  pagos: Pago[]
+  // inscripciones: () => Inscripcion[],
+  // _inscripciones: MongoId[],
+  // pagos: () => Pago[]
+  // _pagos: MongoId[]
 }
 
 
@@ -39,7 +43,7 @@ export type InscripcionBase = {
   activa: boolean,
   tarifas: Tarifa[],
   baja?: Date,
-  dias: number
+  horarios: Horario[]
 }
 
 export type InscripcionMongo = InscripcionBase & { _id: ObjectId, alumne: ObjectId, taller: ObjectId }
@@ -48,7 +52,7 @@ export type InscripcionPost = {
   tarifa_inicial?: Tarifa,      // Las tarifas son solo de referencia
   alumne: MongoId,
   taller: MongoId,
-  dias: number,
+  horarios: Horario[],
   iniciada?: Date
 }
 
@@ -56,16 +60,20 @@ export type InscripcionPut = {
   _id: MongoId,
   iniciada?: Date,
   activa?: boolean,
-  dias?: number,
+  horarios?: Horario[],
   tarifa?: Tarifa
 }
 
+// export type InscripcionCable = InscripcionBase & {
+//   _id: MongoId,
+//   alumne: MongoId,
+//   taller: MongoId
+// }
+
 export type Inscripcion = InscripcionBase & {
-  _id: string,
-  alumne: Alumne,
-  taller: Taller
-  pagos: Pago[],
-  titulo?: string
+  _id: MongoId,
+  alumne: MongoId,
+  taller: MongoId
 }
 
 
@@ -80,19 +88,25 @@ export type MovimientoBase = {
 
 export type MovimientoGenerico = MovimientoBase & { razon: 'otra' }
 
-export type MovimientoInscripcion = MovimientoBase & { razon: 'inscripcion', inscripcion: Inscripcion, mes: Date }
-export type MovimientoClaseSuelta = MovimientoBase & { razon: 'clase suelta', alumne: Alumne, taller: Taller }
-export type MovimientoLiquidacionProfe = MovimientoBase & { razon: 'liquidacion profe', taller: MongoId, mes: Date }
+export type MovimientoInscripcion = MovimientoBase & { razon: 'inscripcion', alumne: () => Alumne, _alumne: MongoId, taller: () => Taller, _taller: MongoId, inscripcion: () => Inscripcion, _inscripcion: MongoId, mes: Date }
+// export type MovimientoInscripcionCable = MovimientoBase & { razon: 'inscripcion', alumne: MongoId, taller: MongoId, inscripcion: MongoId, mes: Date }
+
+export type MovimientoClaseSuelta = MovimientoBase & { razon: 'clase suelta', alumne: () => Alumne, _alumne: MongoId, taller: () => Taller, _taller: MongoId, ocasion: Date }
+// export type MovimientoClaseSueltaCable = MovimientoBase & { razon: 'clase suelta', alumne: MongoId, taller: MongoId, ocasion: Date }
+
+export type MovimientoLiquidacionProfe = MovimientoBase & { razon: 'liquidacion profe', taller: () => Taller, _taller: MongoId, mes: Date }
+// export type MovimientoLiquidacionProfeCable = MovimientoBase & { razon: 'liquidacion profe', taller: MongoId, mes: Date }
 
 export type MovimientoInscripcionMongo = MovimientoBase & { razon: 'inscripcion', inscripcion: ObjectId, mes: Date }
 export type MovimientoClaseSueltaMongo = MovimientoBase & { razon: 'clase suelta', alumne: ObjectId, taller: ObjectId }
 export type MovimientoLiquidacionProfeMongo = MovimientoBase & { razon: 'liquidacion profe', taller: ObjectId, mes: Date }
 
 export type MovimientoInscripcionPost = MovimientoBase & { razon: 'inscripcion', inscripcion: MongoId, mes: Date }
-export type MovimientoClaseSueltaPost = MovimientoBase & { razon: 'clase suelta', alumne: MongoId, taller: MongoId }
+export type MovimientoClaseSueltaPost = MovimientoBase & { razon: 'clase suelta', alumne: MongoId, ocasion: Date, taller: MongoId }
 export type MovimientoLiquidacionProfePost = MovimientoBase & { razon: 'liquidacion profe', taller: MongoId, mes: Date }
 
 export type Movimiento = { _id: MongoId } & (MovimientoGenerico | MovimientoInscripcion | MovimientoClaseSuelta | MovimientoLiquidacionProfe)
+// export type MovimientoCable = { _id: MongoId } & (MovimientoGenerico | MovimientoInscripcionCable | MovimientoClaseSueltaCable | MovimientoLiquidacionProfeCable)
 export type MovimientoMongo = { _id: ObjectId } & (MovimientoGenerico | MovimientoInscripcionMongo | MovimientoClaseSueltaMongo | MovimientoLiquidacionProfeMongo)
 export type MovimientoPost = MovimientoGenerico | MovimientoInscripcionPost | MovimientoClaseSueltaPost | MovimientoLiquidacionProfePost
 export type MovimientoPut = { _id: MongoId, detalle: string }
@@ -112,7 +126,12 @@ export type TallerBase = {
 export type TallerMongo = TallerBase & { _id: ObjectId }
 export type TallerPost = Omit<TallerBase, 'activo'>
 export type TallerPut = Partial<TallerBase> & { _id: MongoId }
-export type Taller = TallerBase & { _id: string, inscripciones: Inscripcion[] }
+// export type TallerCable = TallerBase & { _id: MongoId, inscripciones: MongoId[] }
+export type Taller = TallerBase & { 
+  _id: string, 
+  // inscripciones: () => Inscripcion[], 
+  // _inscripciones: MongoId[] 
+}
 
 
 // Asistencias

@@ -11,7 +11,11 @@ interface AppContextInterface{
   talleres: Taller[],
   setTalleres: Dispatch<SetStateAction<Taller[]>>,
   asistencias: Asistencia[],
-  setAsistencias: Dispatch<SetStateAction<Asistencia[]>>
+  setAsistencias: Dispatch<SetStateAction<Asistencia[]>>,
+  endpointsLoaded: string[],
+  setEndpointsLoaded: Dispatch<SetStateAction<string[]>>
+  ready: boolean,
+  setReady: Dispatch<SetStateAction<boolean>>
 }
 
 export const AppContext = createContext<AppContextInterface>({
@@ -20,9 +24,14 @@ export const AppContext = createContext<AppContextInterface>({
   movimientos: [],
   talleres: [],
   asistencias: [],
+  endpointsLoaded: [],
+  ready: false,
   setAlumnes: () => {},
   setInscripciones: () => {},
   setMovimientos: () => {},
   setTalleres: () => {},
-  setAsistencias: () => {}
+  setAsistencias: () => {},
+  setEndpointsLoaded: () => {},
+  setReady: () => {},
+
 })

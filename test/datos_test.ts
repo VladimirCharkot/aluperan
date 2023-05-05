@@ -1,13 +1,13 @@
 import { Alumne, Taller, Movimiento, MovimientoInscripcion, InscripcionPost, TallerPost, AlumnePost, Inscripcion, Asistencia, AsistenciaPost } from '../lib/api';
-import { post_alumne } from '../lib/alumnes';
-import { post_taller } from '../lib/talleres';
-import { AlmacenMovimientos } from '../lib/movimientos';
+import { post_alumne } from '../lib/db/alumnes';
+import { post_taller } from '../lib/db/talleres';
+import { AlmacenMovimientos } from '../lib/db/movimientos';
 import { find, flatten, random, range, sample, uniqBy } from 'lodash';
-import { post_inscripcion } from '../lib/inscripciones';
+import { post_inscripcion } from '../lib/db/inscripciones';
 import { eachDayOfInterval, eachMonthOfInterval } from 'date-fns';
-import clientPromise from '../lib/mongodb';
+import clientPromise from '../lib/db/mongodb';
 import { dias_ids } from '../lib/utils';
-import { post_asistencias } from '../lib/asistencias';
+import { post_asistencias } from '../lib/db/asistencias';
 
 const talleres: TallerPost[] = [{
   nombre: 'Aro',

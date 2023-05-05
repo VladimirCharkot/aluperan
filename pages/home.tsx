@@ -14,15 +14,11 @@ export default function Home() {
   const [pagina, setPagina] = useState('alumnes')
   const NavLink = ({ addr }: any) => <p className='text-lg my-2 cursor-pointer' onClick={() => setPagina(addr)}>{capitalize(addr)}</p>
 
-  const { traerAlumnes, traerInscripciones, traerMovimientos, traerTalleres } = useBackend()
+  const { pullBackend, ready } = useBackend()
   const [cambiandoPass, setCambiandoPass] = useState(false)
 
-  useEffect(() => {
-    traerAlumnes()
-    traerInscripciones()
-    traerMovimientos()
-    traerTalleres()
-  }, [])
+  // Traer datos del backend
+  useEffect(() => { pullBackend() }, [])
 
   const { loggedIn, setLoggedIn } = useContext(LoginContext)
   
@@ -43,22 +39,23 @@ export default function Home() {
       <div className="container">
         {cambiandoPass && <ModalCambiarPass cerrar={() => setCambiandoPass(false)}/>}
         {!loggedIn && <p className='p-5'>No autorizado</p>}
-        {loggedIn &&
+        {loggedIn && !ready && <div className='flex flex-row w-screen h-screen align-center justify-center'><p>Cargando...</p></div>}
+        {loggedIn && ready &&
           <div className='flex flex-row w-screen'>
             <div className='textura p-5 flex flex-col px-8 text-rye'>
               <NavLink addr='alumnes' />
               <NavLink addr='talleres' />
-              <NavLink addr='inscripciones' />
+              {/* <NavLink addr='inscripciones' /> */}
               <NavLink addr='movimientos' />
               <hr className='border-black my-5' />
               <p className='text-lg my-2 cursor-pointer' onClick={() => setCambiandoPass(true)}>Cambiar Pass</p>
               <p className='text-lg my-2 cursor-pointer' onClick={logout}>Salir</p>
               <div className='alupe w-full h-32 mt-auto cursor-pointer'/>
             </div>
-            {pagina == 'alumnes' && <Alumnes />}
-            {pagina == 'talleres' && <Talleres />}
-            {pagina == 'inscripciones' && <Inscripciones />}
-            {pagina == 'movimientos' && <Movimientos />}
+            {ready && pagina == 'alumnes' && <Alumnes />}
+            {ready && pagina == 'talleres' && <Talleres />}
+            {/* {ready && pagina == 'inscripciones' && <Inscripciones />} */}
+            {ready && pagina == 'movimientos' && <Movimientos />}
           </div>
         }
       </div>

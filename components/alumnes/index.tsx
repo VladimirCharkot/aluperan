@@ -1,10 +1,9 @@
-import { useContext, useEffect, useState } from "react";
+import { useState } from "react";
 import { Alumne } from "../../lib/api";
 import { CartaAlumne } from "./alumne";
 import { Lista } from "../general/display/lista";
 import { Boton } from "../general/input/boton";
 import { ModalNuevoAlumne } from "../general/modales/modalNuevoAlumne";
-import { AppContext } from "../context"; 
 import { sortBy } from "lodash";
 import { useBackend } from "../context/backend";
 

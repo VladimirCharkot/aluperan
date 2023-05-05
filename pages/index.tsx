@@ -13,12 +13,15 @@ const Index = () => {
   const [talleres, setTalleres] = useState<Taller[]>([])
   const [movimientos, setMovimientos] = useState<Movimiento[]>([])
   const [asistencias, setAsistencias] = useState<Asistencia[]>([])
+  const [endpointsLoaded, setEndpointsLoaded] = useState<string[]>([])
+  const [ready, setReady] = useState<boolean>(false)
   const appCtx = {
     alumnes, setAlumnes,
     inscripciones, setInscripciones,
     talleres, setTalleres,
     movimientos, setMovimientos,
-    asistencias, setAsistencias
+    asistencias, setAsistencias,
+    ready, setReady, endpointsLoaded, setEndpointsLoaded
   }
 
 

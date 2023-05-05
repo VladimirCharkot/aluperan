@@ -33,3 +33,5 @@ export const check_password = async (plaintext_password: string) => {
   // const hash
   return await compare(plaintext_password, r.value)
 }
+
+// init_password('test')

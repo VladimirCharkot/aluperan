@@ -1,5 +1,5 @@
 import { ChangeEventHandler, Dispatch, SetStateAction, useContext, useEffect, useState } from 'react';
-import { find, first, range } from 'lodash';
+import { find, range } from 'lodash';
 
 import { Modal } from '../display/modal';
 import { P } from '../display/p';
@@ -9,8 +9,7 @@ import { Boton } from '../input/boton';
 import { Radio } from '../input/radio';
 import { Select } from '../input/select';
 
-import { AppContext } from '../../context';
-import { Alumne, Taller, InscripcionPost, Inscripcion } from '../../../lib/api';
+import { Alumne, Taller } from '../../../lib/api';
 import { useBackend } from '../../context/backend';
 
 interface ModalInscripcionProps {
@@ -22,9 +21,9 @@ interface ModalInscripcionProps {
 
 type Handler = ChangeEventHandler<HTMLSelectElement>
 
-export const ModalInscripcion = ({ alumne, taller, cerrar, setAlumne }: ModalInscripcionProps) => {
+export const ModalInscripcion = ({ alumne, taller, cerrar }: ModalInscripcionProps) => {
 
-  const { talleres, alumnes, crearInscripcion } = useBackend();
+  const { talleres, alumnes, crearInscripcion, lkpInscripcionesAlumne, lkpTallerInscripcion } = useBackend();
 
   const [dias, setDias] = useState(1)
   const [tall, setTaller] = useState<Taller | undefined>(taller)
@@ -44,9 +43,11 @@ export const ModalInscripcion = ({ alumne, taller, cerrar, setAlumne }: ModalIns
   useEffect(() => { updateTaller(tall ? tall._id : undefined) }, [tall])
   useEffect(() => { updateAlumne(alum ? alum._id : undefined) }, [alum])
 
+  const inscripciones_alum = alum ? lkpInscripcionesAlumne(alum) : []
+
   // Talleres que no se encuentren en la lista de inscripciones del alumne
   const talleres_disponibles = alum ?
-    talleres.filter(t => !find(alum.inscripciones, i => i.taller._id == t._id)) :
+    talleres.filter(t => !find(inscripciones_alum, i => lkpTallerInscripcion(i)._id == t._id)) :
     talleres
 
   const valido = !!inscripcion.alumne && !!inscripcion.taller && !!inscripcion.dias

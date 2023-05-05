@@ -1,7 +1,7 @@
 import { withIronSessionApiRoute } from 'iron-session/next'
 import { sessionOptions } from '../../lib/session'
 import { NextApiRequest, NextApiResponse } from "next"
-import { check_password, update_password } from '../../lib/password'
+import { check_password, update_password } from '../../lib/db/password'
 
 async function login(req: NextApiRequest, res: NextApiResponse) {
 

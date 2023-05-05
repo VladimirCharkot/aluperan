@@ -1,16 +1,14 @@
 import { useContext, useEffect, useState } from "react"
-import { capitalize, find, flatten } from "lodash"
+import { capitalize, flatten, groupBy } from "lodash"
 
-import { Alumne, Asistencia, Inscripcion, MovimientoLiquidacionProfePost, Pago, Taller } from "../../lib/api"
+import { MovimientoClaseSuelta, MovimientoInscripcion, MovimientoLiquidacionProfePost, Pago, Taller } from "../../lib/api"
 import { Id } from "../general/display/id"
 import { dias, dias_semana, nombres_meses } from "../../lib/utils"
 import { Enumerador } from "../general/display/enumerador"
 import { Horario } from "../../lib/api"
-import { AppContext } from "../context"
 import { addMonths, endOfMonth, isAfter, isBefore, isEqual, isSameMonth, startOfMonth } from "date-fns"
 import { Boton } from "../general/input/boton"
 
-import axios from "axios";
 import { ModalConfirmarLiquidacion } from "../general/modales/modalConfirmarLiquidacion"
 import { ModalPasarLista } from "../general/modales/modalPasarLista"
 
@@ -24,8 +22,13 @@ interface InfoTallerProps {
 
 export const InfoTaller = ({ taller }: InfoTallerProps) => {
 
-  const { inscripciones } = useContext(AppContext);
-  const alumnes_con_info_de_pago = alumnes_con_info_pago(inscripciones, taller._id)
+  // const alumnes_con_info_de_pago = alumnes_con_info_pago(inscripciones, movimientos, taller._id)
+
+  const [viendoPagos, setViendoPagos] = useState(false);
+  const toggleVerPagos = () => setViendoPagos(!viendoPagos)
+
+  const [viendoAsistencias, setViendoAsistencias] = useState(false);
+  const toggleVerAsistencias = () => setViendoAsistencias(!viendoAsistencias)
 
 
   return (<>
@@ -34,12 +37,17 @@ export const InfoTaller = ({ taller }: InfoTallerProps) => {
 
     <Enumerador cabecera="Horarios:" coleccion={taller.horarios} accesor={(h: Horario) => `${dias[h.dia]} ${h.hora}`} nodata='Sin horarios' />
     <Enumerador cabecera="Precios:" coleccion={taller.precios.map((c, i) => `${dias_semana[i]}: $${c}`)} nodata='Sin precios' />
-    <Enumerador cabecera="Alumnes:" coleccion={alumnes_con_info_de_pago} accesor={a => a.nombre} nodata='Sin alumnes' decorador={a => a.mes_pago ? 'border-emerald-300' : 'border-red-300'} />
+    {/* <Enumerador cabecera="Alumnes:" coleccion={alumnes_con_info_de_pago} accesor={a => a.nombre} nodata='Sin alumnes' decorador={a => a.mes_pago ? 'border-emerald-300' : 'border-red-300'} /> */}
     <Enumerador cabecera="Inició:" coleccion={[new Date(taller.iniciado).toLocaleDateString('es-ES')]} nodata='Sin fecha de inicio' />
 
     <hr className="my-2" />
 
-    <PagosEsteMes alumnes={alumnes_con_info_de_pago} />
+    <div className="flex">
+      <Boton texto="Pagos" color="indigo" onClick={() => {setViendoPagos(!viendoAsistencias)}}/>
+      <Boton texto="Asistencias" color="indigo" onClick={() => {setViendoAsistencias(!viendoPagos)}}/>
+    </div>
+
+    {/* {viendoPagos && <PagosEsteMes alumnes={alumnes_con_info_de_pago} />} */}
 
     <hr className="my-2" />
 
@@ -49,7 +57,7 @@ export const InfoTaller = ({ taller }: InfoTallerProps) => {
 
     <Asistencias taller={taller} />
 
-    <Id id={taller._id} />
+    {process.env.NODE_ENV == 'development' && <Id id={taller._id} />}
   </>)
 }
 
@@ -61,16 +69,9 @@ interface PagosEsteMesProps {
 
 const PagosEsteMes = ({ alumnes }: PagosEsteMesProps) => {
 
-  const [viendoPagos, setViendoPagos] = useState(false)
-  const toggleVerPagos = () => setViendoPagos(!viendoPagos)
-
   return (
     <>
-    <FlexR>
-      <Boton texto={viendoPagos ? "Ocultar pagos" : "Ver pagos"}
-        color="indigo" onClick={toggleVerPagos} />
-    </FlexR>
-      {viendoPagos && <div className="grid grid-cols-4 my-4">
+      <div className="grid grid-cols-4 my-4">
         <p>Alumne</p>
         <p>Pago</p>
         <p>Medio</p>
@@ -81,7 +82,7 @@ const PagosEsteMes = ({ alumnes }: PagosEsteMesProps) => {
           <p className="text-sm">{a.pago ? capitalize(a.pago.medio) : "-"}</p>
           <p className="text-sm">{a.pago ? new Date(a.pago.fecha).toLocaleDateString("es-ES") : "-"}</p>
         </>)}
-      </div>}
+      </div>
     </>
   )
 }
@@ -125,15 +126,16 @@ interface LiquidacionMesPasadoProps {
 
 const LiquidacionMesPasado = ({ taller }: LiquidacionMesPasadoProps) => {
 
-  const { inscripciones, movimientos, crearMovimiento } = useBackend()
+  const { movimientos, crearMovimiento, lkpInscripcionesTaller, lkpPagosInscripcion } = useBackend()
+  
+  const inscripciones_este_taller = lkpInscripcionesTaller(taller).filter(i => i.activa)
 
   const balance_liquidacion = (mes: Date) => {
     const inicio_mes = startOfMonth(mes)
     const fin_mes = endOfMonth(mes)
-    console.log(`Calculando balance entre ${inicio_mes.toLocaleDateString('es-ES')} y ${fin_mes.toLocaleDateString('es-ES')}...`)
+    // console.log(`Calculando balance entre ${inicio_mes.toLocaleDateString('es-ES')} y ${fin_mes.toLocaleDateString('es-ES')}...`)
 
-    const inscripciones_este_taller = inscripciones.filter(i => i.activa && i.taller._id == taller._id)
-    const pagos_este_taller = flatten(inscripciones_este_taller.map(i => i.pagos))
+    const pagos_este_taller = flatten(inscripciones_este_taller.map(i => lkpPagosInscripcion(i)))
 
     const pagos_mes = pagos_este_taller.filter(p => {
       const f = new Date(p.fecha);
@@ -144,10 +146,10 @@ const LiquidacionMesPasado = ({ taller }: LiquidacionMesPasadoProps) => {
     //@ts-ignore
     const liquidaciones_este_taller = movimientos.filter(m => m.razon == "liquidacion profe" && m.taller == taller._id)
     const liquidacion_mes_pendiente = liquidaciones_este_taller.filter(m => m.razon == "liquidacion profe" && isSameMonth(new Date(m.mes), inicio_mes_pasado)).length == 0
-    console.log(`Liquidaciones para ${taller.nombre}...`)
-    console.log(liquidaciones_este_taller)
+    // console.log(`Liquidaciones para ${taller.nombre}...`)
+    // console.log(liquidaciones_este_taller)
 
-    console.log(`Pendiente? ${liquidacion_mes_pendiente}`)
+    // console.log(`Pendiente? ${liquidacion_mes_pendiente}`)
 
     return {
       total: total_recaudado_mes,
@@ -211,20 +213,30 @@ const LiquidacionMesPasado = ({ taller }: LiquidacionMesPasadoProps) => {
 
 
 
+interface Periodo{ desde: Date, hasta: Date}
 
-const alumnes_con_info_pago = (inscripciones: Inscripcion[], id_taller: string) => {
-  const inicio_mes = startOfMonth(new Date())
-  const fin_mes = endOfMonth(new Date())
+const alumnes_con_info_pago = (taller: Taller, periodo: Periodo = {desde : startOfMonth(new Date()), hasta: endOfMonth(new Date())}) => {
+  const { movimientos } = useBackend()
+  const isInRange = (d: Date) => (isAfter(d, periodo.desde) && isBefore(d, periodo.hasta)) || isEqual(d, periodo.desde)
 
-  const inscripciones_este_taller = inscripciones.filter(i => i.taller._id == id_taller)
-  const alumnes_con_info_de_pago =
-    inscripciones_este_taller.map(i => {
-      const pago = find(i.pagos, p => {
-        const f = new Date(p.fecha)
-        return isBefore(f, fin_mes) && isAfter(f, inicio_mes) || isEqual(f, inicio_mes)
-      })
-      return { ...i.alumne, mes_pago: !!pago, pago }
-    })
+  // const inscripciones_este_taller = inscripciones.filter(i => i.taller._id == id_taller)
+  const pagos_este_taller_este_periodo = movimientos
+    .filter(m => (m.razon == "clase suelta" || m.razon == "inscripcion") && m._taller == taller._id && isInRange(m.fecha)) as (MovimientoClaseSuelta | MovimientoInscripcion)[]
 
-  return alumnes_con_info_de_pago
+  const pagos_por_alumne = groupBy(pagos_este_taller_este_periodo, m => m._alumne)
+
+  console.log('pagos_por_alumne')
+  console.log(pagos_por_alumne)
+
+
+  // const alumnes_con_info_de_pago =
+  //   inscripciones_este_taller.map(i => {
+  //     // To do: que esto sea un array ya que puede haber varios pagos de la misma inscripción para el mismo período
+  //     const pago = find(i.pagos, p => {
+  //       return isBefore(p.fecha, fin_mes) && isAfter(p.fecha, inicio_mes) || isEqual(p.fecha, inicio_mes)
+  //     })
+  //     return { ...i.alumne, mes_pago: !!pago, pago }
+  //   })
+
+  // return alumnes_con_info_de_pago
 }

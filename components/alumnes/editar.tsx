@@ -17,7 +17,8 @@ interface EditarAlumneProps {
 
 export const EditarAlumne = ({ alumne, setAlum, setEditing }: EditarAlumneProps) => {
 
-  const { editarInscripcion, editarAlumne } = useBackend();
+  const { editarInscripcion, editarAlumne, lkpInscripcionesAlumne, lkpTallerInscripcion } = useBackend();
+  const inscripciones = lkpInscripcionesAlumne(alumne);
 
   const [inscribiendo, setInscribiendo] = useState<boolean>(false);
   const [bajando, setBajando] = useState<boolean>(false);
@@ -27,17 +28,10 @@ export const EditarAlumne = ({ alumne, setAlum, setEditing }: EditarAlumneProps)
   const updateCelu: Handler = e => { setAlum(a => ({ ...a, celular: e.target.value })) }
   const updateNombre: Handler = e => { setAlum(a => ({ ...a, nombre: e.target.value })) }
 
-  const deleteInscripcion = (inscr: string) => 
-    editarAlumne({_id: alumne._id, inscripciones: alumne.inscripciones.filter(i => i._id != inscr)})
-
-
-  const baja = (id: string) => editarInscripcion({ _id: id, activa: false }).then(() => {
-    deleteInscripcion(id) 
-  });
-
-  const update = () => {editarAlumne(alumne).then(() => {
-    setEditing(false)
-  } )}
+  
+  const baja = (id: string) => editarInscripcion({ _id: id, activa: false })
+  const update = () => {editarAlumne(alumne).then(cerrar)}
+  const cerrar = () => setEditing(false)
 
   useEffect(() => {
     if (bajaConfirmada) editarAlumne({_id: alumne._id, activo: false}) 
@@ -64,14 +58,12 @@ export const EditarAlumne = ({ alumne, setAlum, setEditing }: EditarAlumneProps)
       </div>
 
       <p className="text-xl mt-3">Inscripciones:</p>
-      {alumne.inscripciones.map(i => <div key={i._id} className="flex flex-row items-center justify-between my-2">
-        <p>{`${i.taller.nombre} (${i.dias})`}</p>
+      {inscripciones.map(i => <div key={i._id} className="flex flex-row items-center justify-between my-2">
+        <p>{`${lkpTallerInscripcion(i).nombre} (${i.dias})`}</p>
         <Boton color="red" texto="Baja" onClick={() => baja(i._id)} />
       </div>)}
 
-      <Boton color="emerald" texto="Agregar inscripcion" onClick={() => {
-        setInscribiendo(true);
-      }} />
+      <Boton color="emerald" texto="Agregar inscripcion" onClick={() => { setInscribiendo(true); }} />
 
       <hr />
 

@@ -14,12 +14,15 @@ export default function Talleres() {
   const [agregando, setAgregando] = useState(false)
   const [filtro, setFiltro] = useState('');
 
+  const filtrarPorNombreOProfe = (t: Taller) => t.nombre.toLowerCase().includes(filtro.toLowerCase()) || t.profe.toLowerCase().includes(filtro.toLowerCase())
+  const filtrarInactivos = (t: Taller) => t.activo !== false
+
   const cerrarModal = () => setAgregando(false)
   const abrirModal = () => setAgregando(true)
 
   const talleres_mostrados = sortBy(talleres
-    .filter(t => t.nombre.toLowerCase().includes(filtro.toLowerCase()) || t.profe.toLowerCase().includes(filtro.toLowerCase()))
-    .filter(t => t.activo !== false), t => t.nombre)
+    .filter(filtrarPorNombreOProfe)
+    .filter(filtrarInactivos), t => t.nombre)
 
   return (
     <Lista titulo="Talleres" bg="burbujas" >

@@ -30,10 +30,10 @@ export const EditarTaller = ({ taller, setTaller, setEditing }: EditarTallerProp
 
   const updateNombre: Handler = e => setTaller(t => ({ ...t, nombre: e.target.value }))
   const updateProfe: Handler = e => setTaller(t => ({ ...t, profe: e.target.value }))
-  const deleteInscripcion = (inscr: string) => setTaller(t => ({
-    ...t,
-    inscripciones: t.inscripciones.filter(i => i._id != inscr)
-  }))
+  // const deleteInscripcion = (inscr: string) => setTaller(t => ({
+  //   ...t,
+  //   inscripciones: t.inscripciones.filter(i => i._id != inscr)
+  // }))
   const quitarHorario = (i: number) => setTaller(t => ({
     ...t,
     horarios: [...t.horarios.slice(0, i), ...t.horarios.slice(i + 1)]
@@ -44,7 +44,7 @@ export const EditarTaller = ({ taller, setTaller, setEditing }: EditarTallerProp
   }))
 
   const baja = (id: string) => axios.put('/api/inscripciones', { _id: id, activa: false }).then(
-    r => { if (r.status == 200) deleteInscripcion(id) }
+    // r => { if (r.status == 200) deleteInscripcion(id) }
   )
 
   const update = () => axios.put('/api/talleres', taller).then(
@@ -89,8 +89,8 @@ export const EditarTaller = ({ taller, setTaller, setEditing }: EditarTallerProp
     </div>)}
 
     <p className="text-xl mt-3">Alumnes:</p>
-    {taller.inscripciones.map(i => <div key={i._id} className="flex flex-row items-center justify-between my-2">
-      <p>{i.alumne.nombre}</p>
+    {taller.inscripciones().map(i => <div key={i._id} className="flex flex-row items-center justify-between my-2">
+      <p>{i.alumne().nombre}</p>
       <Boton color="red" texto="Baja" onClick={() => baja(i._id)} />
     </div>)}
 

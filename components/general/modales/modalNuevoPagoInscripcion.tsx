@@ -25,7 +25,7 @@ export type Handler = ChangeEventHandler<HTMLSelectElement>
 const medios: MedioDePago[] = ['efectivo', 'mercadopago', 'otro']
 
 export const ModalNuevoPagoInscripcion = ({ cerrar, inscripcion }: ModalNuevoPagoInscripcionInterface) => {
-  const { crearMovimiento } = useBackend()
+  const { crearMovimiento, lkpAlumneInscripcion, lkpTallerInscripcion } = useBackend()
 
   const ahora = new Date()
 
@@ -33,11 +33,14 @@ export const ModalNuevoPagoInscripcion = ({ cerrar, inscripcion }: ModalNuevoPag
   const [hayError, setHayError] = useState(false)
   const [mes, setMes] = useState(getMonth(ahora))
 
+  const alum = lkpAlumneInscripcion(inscripcion)
+  const tall = lkpTallerInscripcion(inscripcion)
+
   const [movimiento, setMovimiento] = useState<MovimientoPost>({
     monto: last(inscripcion.tarifas)!.monto,
     medio: 'efectivo',
     fecha: ahora,
-    detalle: `Pago de ${inscripcion.alumne.nombre} por ${inscripcion.taller.nombre} para el mes de ${nombres_meses[mes]}`,
+    detalle: `Pago de ${alum.nombre} por ${tall.nombre} para el mes de ${nombres_meses[mes]}`,
     razon: "inscripcion",
     inscripcion: inscripcion._id,
     mes: new Date(ahora.getFullYear(), mes)
@@ -48,7 +51,7 @@ export const ModalNuevoPagoInscripcion = ({ cerrar, inscripcion }: ModalNuevoPag
   const updateTarifa = (t: number) => setMovimiento(mov => ({ ...mov, monto: t }))
 
   useEffect(() => {
-    updateDetalle(`Pago de ${inscripcion.alumne.nombre} por ${inscripcion.taller.nombre} para el mes de ${nombres_meses[mes]}`)
+    updateDetalle(`Pago de ${alum.nombre} por ${tall.nombre} para el mes de ${nombres_meses[mes]}`)
   }, [mes])
 
   const postMovimiento = () => { crearMovimiento(movimiento).then(cerrar) } 
