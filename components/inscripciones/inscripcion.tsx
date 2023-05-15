@@ -1,11 +1,9 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { last } from "lodash";
-import { Inscripcion, Movimiento, MovimientoMongo } from "../../lib/api";
-import { balance_inscripcion, format_curr } from "../../lib/utils";
+import { Inscripcion } from "../../lib/api";
 import { CartaBalance } from "../movimientos/balance";
-import { Status } from "../general/display/status";
 import { Boton } from "../general/input/boton";
-import { ModalNuevoPagoInscripcion } from "../general/modales/modalNuevoPagoTaller";
+import { ModalNuevoPagoTaller} from "../general/modales/modalNuevoPagoTaller";
 import { Controles } from "../general/display/controles";
 import { useBackend } from "../context/backend";
 
@@ -17,7 +15,7 @@ export const CartaInscripcion = ({ inscripcion }: CartaInscripcionProps) => {
   const [ingresandoPago, setIngresandoPago] = useState(false);
   const [viendoMovimientos, setViendoMovimientos] = useState(false);
   // const movimientos = balance_inscripcion(inscripcion);
-  const { lkpPagosInscripcion } = useBackend()
+  const { lkpPagosInscripcion, lkpTallerInscripcion } = useBackend()
   const pagos = lkpPagosInscripcion(inscripcion)
 
   return (
@@ -49,7 +47,7 @@ export const CartaInscripcion = ({ inscripcion }: CartaInscripcionProps) => {
       <Controles>
         <Boton addons="m-4" texto={viendoMovimientos ? "Ocultar pagos" : "Ver pagos"} color="indigo" onClick={() => setViendoMovimientos(!viendoMovimientos)} />
         <Boton addons="m-4" texto="Ingresar pago" color="emerald" onClick={() => setIngresandoPago(!ingresandoPago)} />
-        {ingresandoPago && <ModalNuevoPagoInscripcion cerrar={() => setIngresandoPago(false)} inscripcion={inscripcion} />}
+        {ingresandoPago && <ModalNuevoPagoTaller cerrar={() => setIngresandoPago(false)} taller={lkpTallerInscripcion(inscripcion)}/>}
       </Controles>
       <p className="text-xs">{inscripcion._id}</p>
     </li>

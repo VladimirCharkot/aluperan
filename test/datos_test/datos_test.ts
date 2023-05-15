@@ -1,4 +1,4 @@
-import { Alumne, Taller, Movimiento, MovimientoInscripcion, InscripcionPost, TallerPost, AlumnePost, Inscripcion, Asistencia, AsistenciaPost } from '../../lib/api';
+import {  TallerPost, AlumnePost, Inscripcion, AsistenciaPost } from '../../lib/api';
 import { AlmacenMovimientos } from '../../lib/db/movimientos';
 import { find, flatten, random, range, sample, uniqBy } from 'lodash';
 import { eachDayOfInterval, eachMonthOfInterval } from 'date-fns';
