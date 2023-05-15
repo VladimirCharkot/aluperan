@@ -46,7 +46,7 @@ export class AlmacenMovimientos extends Almacen<MovimientoMongo>{
       detalle: movimiento.detalle ?? `Pago de ${alumne.nombre} - ${taller.nombre}`
     })
 
-    return {...r, inscripcion: {...i, alumne, taller}, alumne}
+    return {...r, inscripcion: i._id, taller: taller._id, alumne: alumne._id}
   }
 
   async insertarPagoClaseSuelta(movimiento: MovimientoClaseSueltaPost) {
@@ -59,7 +59,7 @@ export class AlmacenMovimientos extends Almacen<MovimientoMongo>{
     return await super.create({
       ...movimiento,
       ocasion: movimiento.ocasion ?? new Date(),
-      detalle: `Pago de ${alumne.nombre} por clase suelta de ${taller.nombre} el ${movimiento.fecha.toLocaleDateString('es-ES')}`
+      detalle: `Pago de ${alumne.nombre} por clase suelta de ${taller.nombre} el ${new Date(movimiento.fecha).toLocaleDateString('es-ES')}`
     })
 
   }

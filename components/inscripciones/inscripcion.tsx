@@ -5,7 +5,7 @@ import { balance_inscripcion, format_curr } from "../../lib/utils";
 import { CartaBalance } from "../movimientos/balance";
 import { Status } from "../general/display/status";
 import { Boton } from "../general/input/boton";
-import { ModalNuevoPagoInscripcion } from "../general/modales/modalNuevoPagoInscripcion";
+import { ModalNuevoPagoInscripcion } from "../general/modales/modalNuevoPagoTaller";
 import { Controles } from "../general/display/controles";
 import { useBackend } from "../context/backend";
 

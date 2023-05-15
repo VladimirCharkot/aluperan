@@ -52,7 +52,7 @@ export class Almacen<MongoT> {
   }
 
   async createMany(posts: any[]){
-    return posts.map(this.create)
+    return await Promise.all(posts.map(p => this.create(p)))
   }
 
   async delete(del: any) {

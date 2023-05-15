@@ -12,7 +12,7 @@ interface ModalHorarioProps{
 
 export type Handler = ChangeEventHandler<HTMLSelectElement>
 
-export const ModalHorario = ({ setTaller, cerrar }: ModalHorarioProps) => {
+export const ModalHorarioTaller = ({ setTaller, cerrar }: ModalHorarioProps) => {
 
   const [dia, setDia] = useState<string>('lun')
   const [hora, setHora] = useState<string>('9:00')

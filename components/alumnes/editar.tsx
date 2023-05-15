@@ -2,11 +2,14 @@ import { Dispatch, SetStateAction, ChangeEventHandler, useState, useEffect } fro
 import { TextInput } from "../general/input/textInput";
 import { Boton } from "../general/input/boton";
 import { ModalInscripcion } from "../general/modales/modalInscripcion";
-import { Alumne } from "../../lib/api";
+import { Alumne, Inscripcion } from "../../lib/api";
 import { useBackend } from "../context/backend";
 import { FlexR } from "../general/display/flexR";
 import { ModalConfirmarLiquidacion } from "../general/modales/modalConfirmarLiquidacion";
 import { ModalConfirmarBaja } from "../general/modales/modalConfirmarBaja";
+import { capitalize } from "lodash";
+import { formatearHorarios } from "../../lib/utils"; 
+import { ModalHorarioInscripcion } from "../general/modales/modalHorarioInscripcion";
 
 export type Handler = ChangeEventHandler<HTMLInputElement>
 interface EditarAlumneProps {
@@ -18,9 +21,10 @@ interface EditarAlumneProps {
 export const EditarAlumne = ({ alumne, setAlum, setEditing }: EditarAlumneProps) => {
 
   const { editarInscripcion, editarAlumne, lkpInscripcionesAlumne, lkpTallerInscripcion } = useBackend();
-  const inscripciones = lkpInscripcionesAlumne(alumne);
+  const inscripciones_alum = lkpInscripcionesAlumne(alumne).filter(i => i.activa);
 
   const [inscribiendo, setInscribiendo] = useState<boolean>(false);
+  const [estableciendoHorarios, setEstableciendoHorarios] = useState<Inscripcion | undefined>();
   const [bajando, setBajando] = useState<boolean>(false);
   const [bajaConfirmada, setBajaConfirmada] = useState<boolean>(false);
 
@@ -28,7 +32,6 @@ export const EditarAlumne = ({ alumne, setAlum, setEditing }: EditarAlumneProps)
   const updateCelu: Handler = e => { setAlum(a => ({ ...a, celular: e.target.value })) }
   const updateNombre: Handler = e => { setAlum(a => ({ ...a, nombre: e.target.value })) }
 
-  
   const baja = (id: string) => editarInscripcion({ _id: id, activa: false })
   const update = () => {editarAlumne(alumne).then(cerrar)}
   const cerrar = () => setEditing(false)
@@ -42,6 +45,7 @@ export const EditarAlumne = ({ alumne, setAlum, setEditing }: EditarAlumneProps)
 
       {inscribiendo && <ModalInscripcion alumne={alumne} setAlumne={setAlum} cerrar={() => setInscribiendo(false)}/>}
       {bajando && <ModalConfirmarBaja nombre={alumne.nombre} tipo="alumne" cerrar={() => setBajando(false)} setConfirmado={setBajaConfirmada}/>}
+      {estableciendoHorarios && <ModalHorarioInscripcion inscripcion={estableciendoHorarios} cerrar={() => setEstableciendoHorarios(undefined)}/>}
 
       <FlexR justify="between">
         <input className="text-2xl bg-transparent border-b outline-none" value={alumne.nombre} onChange={updateNombre} />
@@ -58,8 +62,9 @@ export const EditarAlumne = ({ alumne, setAlum, setEditing }: EditarAlumneProps)
       </div>
 
       <p className="text-xl mt-3">Inscripciones:</p>
-      {inscripciones.map(i => <div key={i._id} className="flex flex-row items-center justify-between my-2">
-        <p>{`${lkpTallerInscripcion(i).nombre} (${i.dias})`}</p>
+      {inscripciones_alum.map(i => <div key={i._id} className="flex flex-row items-center my-2">
+        <p>{`${lkpTallerInscripcion(i).nombre} (${ i.horarios ? formatearHorarios(i.horarios) : 'SIN HORARIOS'})`}</p>
+        <Boton addons="ml-auto" color="indigo" texto="Establecer horarios" onClick={() => {setEstableciendoHorarios(i)}} />
         <Boton color="red" texto="Baja" onClick={() => baja(i._id)} />
       </div>)}
 

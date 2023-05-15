@@ -11,7 +11,7 @@ import { ModalCambiarPass } from '../components/general/modales/modalCambiarPass
 
 
 export default function Home() {
-  const [pagina, setPagina] = useState('alumnes')
+  const [pagina, setPagina] = useState('talleres')
   const NavLink = ({ addr }: any) => <p className='text-lg my-2 cursor-pointer' onClick={() => setPagina(addr)}>{capitalize(addr)}</p>
 
   const { pullBackend, ready } = useBackend()
@@ -43,8 +43,8 @@ export default function Home() {
         {loggedIn && ready &&
           <div className='flex flex-row w-screen'>
             <div className='textura p-5 flex flex-col px-8 text-rye'>
-              <NavLink addr='alumnes' />
               <NavLink addr='talleres' />
+              <NavLink addr='alumnes' />
               {/* <NavLink addr='inscripciones' /> */}
               <NavLink addr='movimientos' />
               <hr className='border-black my-5' />

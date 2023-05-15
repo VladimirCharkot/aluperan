@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { sortBy, uniq } from "lodash";
+import { some, sortBy, uniq } from "lodash";
 
 import { Modal } from "../display/modal"
 import { PError } from "../display/perror";
@@ -21,35 +21,38 @@ interface ModalPasarListaProps {
 }
 
 export const ModalPasarLista = ({ taller, cerrar }: ModalPasarListaProps) => {
-  const [hoy, setHoy] = useState(true)
-  const { lkpInscripcionesTaller, lkpAlumneInscripcion } = useBackend()
+  const [verTodos, setVerTodos] = useState(false)
+  const toggleVerTodos = () => setVerTodos(!verTodos)
 
-  const nombres_alumnes_taller = sortBy(uniq(lkpInscripcionesTaller(taller).map(i => lkpAlumneInscripcion(i))), a => a.nombre)
+  const [hoy, setHoy] = useState(true)
+  const [fecha, setFecha] = useState(new Date())
+  const dia = dias_ids[fecha.getDay()]
+
+  const { lkpInscripcionesTaller, lkpAlumneInscripcion, crearAsistencias } = useBackend()
+
+
+  // const nombres_alumnes_taller = sortBy(uniq(lkpInscripcionesTaller(taller).map(i => lkpAlumneInscripcion(i))), a => a.nombre)
+
   const toggleAsistencia = (_id: string) => {
     if (asistencias.includes(_id)) setAsistencias(asistencias.filter(id => id != _id))
     else setAsistencias([...asistencias, _id])
   }
 
-  const [fecha, setFecha] = useState(new Date())
-  const dia = dias_ids[fecha.getDay()]
   const horarios = taller.horarios.filter(h => h.dia == dia)
   const horarios_opciones = horarios.map(h => ({ v: h.hora, txt: h.hora }))
   const [horario, setHorario] = useState(horarios.length == 0 ? '' : horarios[0].hora)
   const [asistencias, setAsistencias] = useState<string[]>([])
 
   const texto_fecha = hoy ?
-    `Hoy ${dias[dias_ids[fecha.getDay()]].toLowerCase()}` :   // "hoy martes"
+    `Hoy ${dias[dia].toLowerCase()}` :   // "hoy martes"
     (horarios.length >= 1 ?
       `El ${dias[horarios[0].dia]} ${horarios[0].hora}` :     // "el jueves 14:00hs"
-      `El ${dias[dias_ids[fecha.getDay()]]} ${fecha.toLocaleDateString('es-ES')}`) // "el lunes 13/02/23"
+      `El ${dias[dia]} ${fecha.toLocaleDateString('es-ES')}`) // "el lunes 13/02/23"
 
 
   useEffect(() => {
     setHorario(horarios.length == 0 ? '' : horarios[0].hora)
   }, [fecha])
-
-
-  const { crearAsistencias } = useBackend();
 
   const post_asistencias = () => {
     const data: Omit<Asistencia, '_id'>[] = asistencias.map(a => ({
@@ -58,8 +61,16 @@ export const ModalPasarLista = ({ taller, cerrar }: ModalPasarListaProps) => {
       horario: horario,
       fecha: fecha
     }))
+    console.log(`Posteando...`)
+    console.log(data)
     crearAsistencias(data).then(cerrar)
   }
+
+
+  const inscripciones = lkpInscripcionesTaller(taller).filter(i => i.activa)
+  const inscripcionesEsteHorario   = inscripciones.filter(i => some(i.horarios, h => h.dia == dia && h.hora == horario))
+  const inscripcionesOtrosHorarios = inscripciones.filter(i => !some(i.horarios, h => h.dia == dia && h.hora == horario))
+
 
   return (<Modal cerrar={cerrar}>
     <h2 className="text-lg">Asistencias {taller.nombre}</h2>
@@ -85,13 +96,28 @@ export const ModalPasarLista = ({ taller, cerrar }: ModalPasarListaProps) => {
 
     <P>{texto_fecha} asistieron:</P>
     <div>
-      {nombres_alumnes_taller.map(a =>
-        <FlexR key={a._id}>
+      {inscripcionesEsteHorario.map(i => {
+        const a = lkpAlumneInscripcion(i)
+        return (<FlexR key={i._id}>
           <Check checked={asistencias.includes(a._id)} onClick={() => toggleAsistencia(a._id)} />
           <P>{a.nombre}</P>
         </FlexR>)
-      }
+      })}
     </div>
+
+    <Boton texto="Ver todos" color="indigo" onClick={toggleVerTodos}/>
+    
+    {verTodos && <div>
+      {inscripcionesOtrosHorarios.map(i => {
+        const a = lkpAlumneInscripcion(i)
+        return (<FlexR key={i._id}>
+          <Check checked={asistencias.includes(a._id)} onClick={() => toggleAsistencia(a._id)} />
+          <P>{a.nombre}</P>
+        </FlexR>)
+      })} 
+    </div>}
+
+    <hr />
 
     <Boton texto="Listo" color="emerald" onClick={post_asistencias} />
 

@@ -6,6 +6,7 @@ import { EditarTaller } from './editar';
 
 import { Controles } from "../general/display/controles";
 import { Boton } from "../general/input/boton";
+import { MesSelector } from "../general/input/mes";
 
 interface CartaTallerProps {
   taller: Taller
@@ -15,6 +16,7 @@ export const CartaTaller = ({ taller }: CartaTallerProps) => {
 
   const [editing, setEditing] = useState(false);
   const [tall, setTall] = useState(taller);
+  const [mes, setMes] = useState(new Date());
 
   useEffect(() => {
     setTall(tall)
@@ -22,6 +24,7 @@ export const CartaTaller = ({ taller }: CartaTallerProps) => {
 
   return (
     <Carta>
+      
       {!editing && <InfoTaller taller={tall} />}
       {editing && <EditarTaller taller={tall} setTaller={setTall} setEditing={setEditing} />}
 

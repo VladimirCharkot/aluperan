@@ -2,9 +2,10 @@ import { Dispatch, SetStateAction, useContext, useEffect, useState } from 'react
 import axios from 'axios';
 import { find } from 'lodash';
 
-import { Alumne, AlumnePost, Asistencia, Inscripcion, MongoId, Movimiento, Taller } from '../../lib/api';
+import { Alumne, AlumnePost, Asistencia, Inscripcion, MongoId, Movimiento, MovimientoClaseSuelta, MovimientoInscripcion, MovimientoLiquidacionProfe, Taller } from '../../lib/api';
 import { AppContext } from '.';
 import { read } from 'fs';
+import { isInMonth } from '../../lib/utils';
 
 
 export const endpoints = [
@@ -13,6 +14,7 @@ export const endpoints = [
   '/api/inscripciones/',
   '/api/movimientos/'
 ]
+
 
 export const useBackend = () => {
 
@@ -35,6 +37,41 @@ export const useBackend = () => {
   type Hydrator<Dehydrated, Hydrated> = (arrival: Dehydrated, ...collections: any[]) => Hydrated
 
 
+  const hydrateAlum: Hydrator<Alumne, Alumne> = a => a
+
+  const hydrateInsc: Hydrator<Inscripcion, Inscripcion> = (i: Inscripcion) => ({
+    ...i,
+    iniciada: new Date(i.iniciada), baja: i.baja ? new Date(i.baja) : undefined
+  })
+
+  const hydrateTall: Hydrator<Taller, Taller> = (t: Taller) => ({
+    ...t,
+    iniciado: new Date(t.iniciado)
+  })
+
+  const hydrateMovi: Hydrator<Movimiento, Movimiento> = (m: Movimiento) =>
+    m.razon == 'clase suelta' ? ({
+      ...m,
+      fecha: new Date(m.fecha),
+      ocasion: new Date(m.ocasion)
+    }) :
+      m.razon == 'inscripcion' ? ({
+        ...m,
+        fecha: new Date(m.fecha),
+        mes: new Date(m.mes)
+      }) :
+        m.razon == 'liquidacion profe' ? ({
+          ...m,
+          fecha: new Date(m.fecha),
+          mes: new Date(m.mes),
+        }) :
+          {
+            ...m, fecha: new Date(m.fecha)
+          }
+
+  const hydrateAsis = (a: Asistencia) => ({ ...a, fecha: new Date(a.fecha) })
+
+
 
   // *****************************
   // ** Wrappers para useState: **
@@ -44,13 +81,15 @@ export const useBackend = () => {
   // Recibe un setter y devuelve una función que agrega un elemento a la coleccion
   const addMember = <T>(setter: Setter<T>, hydrate: Hydrator<any, Elem<T>> = t => t) =>
     (elem: Elem<T>) => {
+      console.log(`Agregando a su colección:`)
+      console.log(hydrate(elem))
       setter(col => [...col, hydrate(elem)])
     }
 
-  const addAlum = addMember(setAlumnes)
-  const addTaller = addMember(setTalleres)
-  const addInscripcion = addMember(setInscripciones)
-  const addMovimiento = addMember(setMovimientos)
+  const addAlum = addMember(setAlumnes, hydrateAlum)
+  const addTaller = addMember(setTalleres, hydrateTall)
+  const addInscripcion = addMember(setInscripciones, hydrateInsc)
+  const addMovimiento = addMember(setMovimientos, hydrateMovi)
 
   // Recibe una coleccion y un setter y devuelve una función
   // que recibe un _id y un updater y updatea el miembro de la coleccion con ese _id
@@ -173,13 +212,14 @@ export const useBackend = () => {
   const asistencias_endpoint = '/api/asistencias/'
   const traerAsistencias = async (taller: MongoId, mes: Date) => {
     const r = await axios.get(asistencias_endpoint, { params: { taller, mes } })
-    if (r.status == 200) setAsistencias(asts => [...asts, ...r.data])
+    const asists = r.data.map(hydrateAsis)
+    if (r.status == 200) setAsistencias(asts => [...asts, ...asists])
   }
   const crearAsistencias = async (asistencias: Omit<Asistencia, '_id'>[]) => {
     const r = await axios.post(asistencias_endpoint, asistencias)
-    if (r.status == 200) setAsistencias(asts => [...asts, ...r.data])
+    const asists = r.data.map(hydrateAsis)
+    if (r.status == 200) setAsistencias(asts => [...asts, ...asists])
   }
-
 
 
   const lkpMember = <T>(coleccion: Coleccion<T>) =>
@@ -188,18 +228,28 @@ export const useBackend = () => {
     (_id: MongoId) => coleccion.filter(e => accesor(e) == _id)
 
   const lkpInscripcionesAlumne = (a: Alumne) => lkpMembers(inscripciones, i => i.alumne)(a._id)
-  const lkpPagosAlumne = (a: Alumne) => lkpMembers(movimientos as any[], m => m.alumne)(a._id)
+  const lkpPagosAlumne = (a: Alumne) => lkpMembers(movimientos as any[], m => m.alumne)(a._id) as Movimiento[]
+  const lkpTalleresAlumne = (t: Taller) => lkpInscripcionesAlumne(t).map(i => lkpTallerInscripcion(i))
 
   const lkpAlumneInscripcion = (i: Inscripcion) => lkpMember(alumnes)(i.alumne)
   const lkpTallerInscripcion = (i: Inscripcion) => lkpMember(talleres)(i.taller)
-  const lkpPagosInscripcion = (i: Inscripcion) => lkpMembers(movimientos as any[], m => m.inscripcion)(i._id)
+  const lkpPagosInscripcion = (i: Inscripcion) => lkpMembers(movimientos as any[], m => m.inscripcion)(i._id) as Movimiento[]
 
   const lkpInscripcionesTaller = (t: Taller) => lkpMembers(inscripciones, i => i.taller)(t._id)
+  const lkpAlumnesTaller = (t: Taller) => lkpInscripcionesTaller(t).map(i => lkpAlumneInscripcion(i))
+
+  const lkpMovimientosTaller = (t: Taller) => lkpMembers(movimientos as any[], m => m.taller)(t._id) as Movimiento[]
+  const lkpPagosTaller = (t: Taller) => lkpMovimientosTaller(t).filter(p => p.razon == "clase suelta" || p.razon == "inscripcion") as (MovimientoClaseSuelta | MovimientoInscripcion)[]
+  const lkpLiquidacionesTaller = (t: Taller) => lkpMovimientosTaller(t).filter(p => p.razon == "liquidacion profe") as MovimientoLiquidacionProfe[]
+
+  const lkpAsistenciasAlumneTallerMes = (ta: Taller, al: Alumne, mes: Date) => asistencias.filter(a => a.alumne == al._id && a.taller == ta._id && isInMonth(a.fecha, mes))
+  const lkpInscripcionAlumneTaller = (a: Alumne, t: Taller) => find(lkpInscripcionesAlumne(a), i => i.taller == t._id)!
 
   const lkpAlumne = lkpMember(alumnes)
   const lkpTaller = lkpMember(talleres)
   const lkpInscripcion = lkpMember(inscripciones)
   const lkpMovimiento = lkpMember(movimientos)
+  const lkpAsistencia = lkpMember(asistencias)
 
 
 
@@ -213,11 +263,21 @@ export const useBackend = () => {
       console.log(inscripciones)
       console.log(movimientos)
       setReady(true)
+      //@ts-ignore
+      window.alumnes = alumnes
+      //@ts-ignore
+      window.talleres = talleres
+      //@ts-ignore
+      window.inscripciones = inscripciones
+      //@ts-ignore
+      window.movimientos = movimientos
+      //@ts-ignore
+      window.asistencias = asistencias
     }
   }, [loaded])
 
 
-  
+
   const pullBackend = async () => {
 
     console.log(`Trayendo alumnes...`)
@@ -230,36 +290,6 @@ export const useBackend = () => {
     const raw_movimientos = await traerMovimientos()
 
     if (!raw_alumnes || !raw_talleres || !raw_inscripciones || !raw_movimientos) { console.error(`Error de red... alguna de las colecciones no llegó`); return; }
-
-
-    const hydrateAlum: Hydrator<Alumne, Alumne> = a => a
-
-    const hydrateInsc: Hydrator<Inscripcion, Inscripcion> = (i: Inscripcion) => ({
-      ...i,
-      iniciada: new Date(i.iniciada), baja: i.baja ? new Date(i.baja) : undefined,
-      // titulo: `${getAlumne(i.alumne)!.nombre} - ${getTaller(i.taller)!.nombre}`,
-      pagos: movimientos.filter(m => m.razon == "inscripcion" && m._inscripcion == i._id)
-    })
-
-    const hydrateTall: Hydrator<Taller, Taller> = (t: Taller) => ({
-      ...t,
-      iniciado: new Date(t.iniciado)
-    })
-
-    const hydrateMovi: Hydrator<Movimiento, Movimiento> = (m: Movimiento) =>
-      m.razon == 'clase suelta' ? ({
-        ...m,
-        fecha: new Date(m.fecha),
-        ocasion: new Date(m.ocasion)
-      }) :
-        m.razon == 'inscripcion' ? ({
-          ...m,
-          mes: new Date(m.mes)
-        }) :
-          m.razon == 'liquidacion profe' ? ({
-            ...m,
-            mes: new Date(m.mes),
-          }) : m as any
 
     setAlumnes(raw_alumnes.map(hydrateAlum))
     setTalleres(raw_talleres.map(hydrateTall))
@@ -285,7 +315,14 @@ export const useBackend = () => {
     lkpAlumne,
     lkpTaller,
     lkpInscripcion,
-    lkpMovimiento
+    lkpMovimiento,
+    lkpMovimientosTaller,
+    lkpPagosTaller,
+    lkpLiquidacionesTaller,
+    lkpAsistenciasAlumneTallerMes,
+    lkpTalleresAlumne,
+    lkpAlumnesTaller,
+    lkpInscripcionAlumneTaller
   }
 
 }

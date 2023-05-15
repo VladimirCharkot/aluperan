@@ -42,7 +42,7 @@ export const ModalCambiarPass = ({ cerrar }: any) => {
       <p className='text-xs pb-4'>(10 o más caracteres)</p>
       <TextInput value={newPass} onChange={(e) => setNewPass(e.target.value)} />
 
-      <Boton addons='ml-auto' texto='Agregar' color='emerald' activo={valido} onClick={putPass} />
+      <Boton addons='ml-auto' texto='Cambiar' color='emerald' activo={valido} onClick={putPass} />
 
       {successMsg && <PSuccess>{successMsg}</PSuccess>}
       {errorMsg   && <PError>{errorMsg}</PError>}

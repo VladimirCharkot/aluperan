@@ -4,7 +4,7 @@ interface CartaProps {
 
 export const Carta = ({ children  }: CartaProps) => {
   return (
-    <li className="alumne p-8 bg-white/80 rounded-md m-6 border ">
+    <li className="alumne p-8 bg-white rounded-md m-6 border ">
      {children}
     </li>
   )

@@ -9,7 +9,7 @@ const asistenciasRoute = async (req: NextApiRequest, res: NextApiResponse) => {
 
   try {
     if (req.method == 'GET')  res.json(await almacenAsistencias.getForTaller(req.query.taller as string, req.query.mes ? new Date(req.query.mes as string) : undefined)) 
-    if (req.method == 'POST') res.json(await almacenAsistencias.create(req.body))
+    if (req.method == 'POST') res.json(await almacenAsistencias.createMany(req.body))
     if (req.method && !['POST', 'GET'].includes(req.method)) res.json({ mensaje: 'Método no soportado' })
   } catch (e) {
     console.error(e);

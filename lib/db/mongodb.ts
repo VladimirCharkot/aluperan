@@ -1,6 +1,8 @@
 import { MongoClient } from 'mongodb'
 
 const uri = process.env.MONGODB_URI!
+if(uri === undefined) {console.log(`Está faltando la connection string!`); process.exit();}
+
 const options = {}
 
 let client

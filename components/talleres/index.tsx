@@ -27,6 +27,8 @@ export default function Talleres() {
   return (
     <Lista titulo="Talleres" bg="burbujas" >
       {agregando && <ModalNuevoTaller cerrar={cerrarModal} />}
+
+      {/* Menú */}
       <FlexR justify="between">
         <Boton texto="Agregar" color="indigo" onClick={abrirModal} addons="mx-5" />
         <FlexR>
@@ -34,6 +36,7 @@ export default function Talleres() {
           <input className="mx-6" value={filtro} onChange={e => setFiltro(e.target.value)} />
         </FlexR>
       </FlexR>
+      
       {talleres && talleres_mostrados.map((a) => (
         <CartaTaller key={a._id} taller={a} />
       ))}

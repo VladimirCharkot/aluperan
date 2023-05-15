@@ -2,9 +2,8 @@ import { Dispatch, SetStateAction, ChangeEventHandler, useState, useEffect } fro
 import { Taller } from "../../lib/api"
 import { dias, dias_semana } from "../../lib/utils"
 import { range } from "lodash"
-import axios from 'axios'
 
-import { ModalHorario } from "../general/modales/modalHorarios"
+import { ModalHorarioTaller } from "../general/modales/modalHorarioTaller"
 import { Boton } from "../general/input/boton"
 import { TextInput } from "../general/input/textInput"
 import { TituloInput } from "../general/input/tituloInput"
@@ -26,7 +25,7 @@ export const EditarTaller = ({ taller, setTaller, setEditing }: EditarTallerProp
   const [bajandoTaller, setBajandoTaller] = useState<boolean>(false);
   const [bajaConfirmada, setBajaConfirmada] = useState<boolean>(false);
 
-  const { editarTaller } = useBackend()
+  const { editarTaller, editarInscripcion, lkpInscripcionesTaller, lkpAlumneInscripcion } = useBackend()
 
   const updateNombre: Handler = e => setTaller(t => ({ ...t, nombre: e.target.value }))
   const updateProfe: Handler = e => setTaller(t => ({ ...t, profe: e.target.value }))
@@ -43,13 +42,11 @@ export const EditarTaller = ({ taller, setTaller, setEditing }: EditarTallerProp
     precios: [...t.precios.slice(0, dias), precio, ...t.precios.slice(dias + 1)]
   }))
 
-  const baja = (id: string) => axios.put('/api/inscripciones', { _id: id, activa: false }).then(
-    // r => { if (r.status == 200) deleteInscripcion(id) }
-  )
 
-  const update = () => axios.put('/api/talleres', taller).then(
-    r => { setEditing(false); }
-  )
+
+  const baja = (id: string) => editarInscripcion({ _id: id, activa: false })
+
+  const update = () => editarTaller(taller).then(() => setEditing(false))
 
   useEffect(() => {
     if (bajaConfirmada) editarTaller({_id: taller._id, activo: false}) 
@@ -57,7 +54,7 @@ export const EditarTaller = ({ taller, setTaller, setEditing }: EditarTallerProp
 
   return (<>
 
-    {agregandoHorario && <ModalHorario setTaller={setTaller} cerrar={() => setAgregandoHorario(false)} />}
+    {agregandoHorario && <ModalHorarioTaller setTaller={setTaller} cerrar={() => setAgregandoHorario(false)} />}
     {bajandoTaller && <ModalConfirmarBaja nombre={taller.nombre} tipo="taller" cerrar={() => setBajandoTaller(false)} setConfirmado={setBajaConfirmada}/>}
     
     <FlexR justify="between">
@@ -89,8 +86,8 @@ export const EditarTaller = ({ taller, setTaller, setEditing }: EditarTallerProp
     </div>)}
 
     <p className="text-xl mt-3">Alumnes:</p>
-    {taller.inscripciones().map(i => <div key={i._id} className="flex flex-row items-center justify-between my-2">
-      <p>{i.alumne().nombre}</p>
+    {lkpInscripcionesTaller(taller).filter(i => i.activa).map(i => <div key={i._id} className="flex flex-row items-center justify-between my-2">
+      <p>{lkpAlumneInscripcion(i).nombre}</p>
       <Boton color="red" texto="Baja" onClick={() => baja(i._id)} />
     </div>)}
 
