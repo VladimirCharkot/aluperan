@@ -56,8 +56,9 @@ export class Almacen<MongoT> {
   }
 
   async delete(del: any) {
+    console.log(`Borrando ${del._id} de ${await this.coleccion()}`)
     const r = await (await this.coleccion()).deleteOne({ _id: new ObjectId(del._id) })
-    return r.acknowledged
+    return {ok: r.acknowledged}
   }
 
 }

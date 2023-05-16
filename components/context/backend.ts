@@ -172,7 +172,7 @@ export const useBackend = () => {
       console.log('-------------------')
       console.log(`DELETE ${endpoint}:`)
       console.log(elem)
-      const r = await axios.delete(endpoint, { params: { _id: elem._id } })
+      const r = await axios.delete(endpoint, { data: { _id: elem._id } })
       console.log(r.data)
       console.log('-------------------')
       if (r.status == 200) { deleter(elem._id) }

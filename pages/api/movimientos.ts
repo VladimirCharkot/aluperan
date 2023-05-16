@@ -8,11 +8,12 @@ const movimientosRoute = async (req: NextApiRequest, res: NextApiResponse) => {
   if (!user || user.isLoggedIn === false) { res.status(401).json([]); return }
 
   try {
+    console.log(req.body)
     if (req.method == 'GET')    res.json(await almacenMovimientos.getAll());
     if (req.method == 'POST')   res.json(await almacenMovimientos.create(req.body))
     if (req.method == 'PUT')    res.json(await almacenMovimientos.update(req.body))
     if (req.method == 'DELETE') res.json(await almacenMovimientos.delete(req.body))
-    if (req.method && !['GET', 'POST', 'PUT', 'DElETE'].includes(req.method)) res.json({ mensaje: 'Método no soportado' })
+    if (req.method && !['GET', 'POST', 'PUT', 'DELETE'].includes(req.method)) res.json({ mensaje: 'Método no soportado' })
   } catch (e) {
     console.error(e);
   }
