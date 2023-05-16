@@ -60,8 +60,9 @@ export class AlmacenMovimientos extends Almacen<MovimientoMongo>{
 
     return await super.create({
       ...movimiento,
+      fecha: new Date(movimiento.fecha),
       ocasion: movimiento.ocasion,
-      detalle: `Pago de clase suelta de ${alumne.nombre} a ${taller.nombre} el día ${movimiento.ocasion.toLocaleDateString('es-ES')}` 
+      detalle: `Pago de clase suelta de ${alumne.nombre} a ${taller.nombre} el día ${new Date(movimiento.ocasion).toLocaleDateString('es-ES')}` 
     })
 
   }

@@ -39,7 +39,7 @@ export class AlmacenInscripciones extends Almacen<InscripcionMongo>{
 
   async update(update: InscripcionPut) {
     const _id = new ObjectId(update._id)
-    let r = await super.update(pick(update, ['activa', 'iniciada', 'dias']))
+    let r = await super.update({_id, ...pick(update, ['activa', 'iniciada', 'horarios'])})
     if (update.activa === false) { r = await super.update({ _id, baja: new Date() }) }
     // if (update.tarifa) { return (await ins.updateOne({ _id: _id }, { $push: { tarifas: update.tarifa } })).upsertedId }
     return r
