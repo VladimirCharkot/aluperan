@@ -51,7 +51,7 @@ export const ModalMovimiento = ({ cerrar }: any) => {
         <Select onChange={e => updateMedio(e.target.value as MedioDePago)} opts={opts_medios}/>
 
         <P>Detalle:</P>
-        <TextInput value={movimiento.detalle} onChange={(e) => updateDetalle(e.target.value)} />
+        <TextInput value={movimiento.detalle ?? ""} onChange={(e) => updateDetalle(e.target.value)} />
 
         <Boton addons='ml-auto' texto='Agregar' color='emerald' activo={valido} onClick={postMovimiento} />
 

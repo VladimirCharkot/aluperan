@@ -91,7 +91,7 @@ export type MovimientoLiquidacionProfePost = Omit<MovimientoBase, 'detalle'> & {
 export type Movimiento = { _id: MongoId } & (MovimientoGenerico | MovimientoInscripcion | MovimientoClaseSuelta | MovimientoLiquidacionProfe)
 // export type MovimientoCable = { _id: MongoId } & (MovimientoGenerico | MovimientoInscripcionCable | MovimientoClaseSueltaCable | MovimientoLiquidacionProfeCable)
 export type MovimientoMongo = { _id: ObjectId } & (MovimientoGenerico | MovimientoInscripcionMongo | MovimientoClaseSueltaMongo | MovimientoLiquidacionProfeMongo)
-export type MovimientoPost = MovimientoGenerico | MovimientoInscripcionPost | MovimientoClaseSueltaPost | MovimientoLiquidacionProfePost
+export type MovimientoPost = (MovimientoGenerico | MovimientoInscripcionPost | MovimientoClaseSueltaPost | MovimientoLiquidacionProfePost) & {detalle?: string}
 export type MovimientoPut = { _id: MongoId, detalle?: string, alumne?: MongoId, taller?: MongoId }
 
 

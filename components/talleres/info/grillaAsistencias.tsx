@@ -18,9 +18,8 @@ export const GrillaAsistencias = ({ taller, mes }: GrillaAsistenciasProps) => {
   // const dias = diasMesTaller(taller, mes)
   const inscripciones = lkpInscripcionesTaller(taller).filter(i => i.activa)
   console.log(taller.nombre)
-  return (
-
-    taller.horarios.map(h => {
+  return (<>
+    {taller.horarios.map(h => {
       const dias = diasMesHorario(h, mes)
       const inscripciones_horario = inscripciones.filter(i => i.horarios ? some(i.horarios, hi => hi.dia == h.dia && hi.hora == h.hora) : false)
       return (<>
@@ -49,9 +48,6 @@ export const GrillaAsistencias = ({ taller, mes }: GrillaAsistenciasProps) => {
 
         </div>
       </>)
-    })
-
-
-  )
+    })}
+  </>)
 }
-// ✓

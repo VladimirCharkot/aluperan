@@ -12,7 +12,7 @@ interface AsistenciasProps {
 }
 
 export const Asistencias = ({ taller, mes }: AsistenciasProps) => {
-  const { asistencias, traerAsistencias } = useBackend();
+  const { traerAsistencias } = useBackend();
 
   useEffect(() => { traerAsistencias(taller._id, mes) }, [mes])
 
@@ -23,7 +23,7 @@ export const Asistencias = ({ taller, mes }: AsistenciasProps) => {
 
   return <>
     {pasandoLista && <ModalPasarLista taller={taller} cerrar={cerrarLista} />}
-    <GrillaAsistencias taller={taller} asistencias={asistencias} mes={mes} />
+    <GrillaAsistencias taller={taller} mes={mes} />
       <Boton texto="Pasar lista" color="emerald" onClick={abrirLista} />
     <hr />
   </>
