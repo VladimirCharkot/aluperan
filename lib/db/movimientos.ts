@@ -40,10 +40,12 @@ export class AlmacenMovimientos extends Almacen<MovimientoMongo>{
     const taller = await (await this.sibling('talleres')).findOne({ _id: i.taller })
     if (!taller) return { ok: false, mensaje: `Inconsistencia: No se encontró taller ${i.taller} de la inscripcion ${movimiento.inscripcion} al intentar insertar pago para la misma` }
 
+    const mes = new Date(movimiento.mes)
+
     const r = await super.create({
       ...movimiento,
       inscripcion: new ObjectId(movimiento.inscripcion),
-      detalle: movimiento.detalle ?? `Pago de ${alumne.nombre} - ${taller.nombre}`
+      detalle: `Pago de inscripción de ${alumne.nombre} a ${taller.nombre} para el mes de ${nombres_meses[mes.getMonth()]}`
     })
 
     return {...r, inscripcion: i._id, taller: taller._id, alumne: alumne._id}
@@ -58,8 +60,8 @@ export class AlmacenMovimientos extends Almacen<MovimientoMongo>{
 
     return await super.create({
       ...movimiento,
-      ocasion: movimiento.ocasion ?? new Date(),
-      detalle: `Pago de ${alumne.nombre} por clase suelta de ${taller.nombre} el ${new Date(movimiento.fecha).toLocaleDateString('es-ES')}`
+      ocasion: movimiento.ocasion,
+      detalle: `Pago de clase suelta de ${alumne.nombre} a ${taller.nombre} el día ${movimiento.ocasion.toLocaleDateString('es-ES')}` 
     })
 
   }

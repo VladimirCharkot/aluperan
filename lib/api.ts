@@ -84,15 +84,15 @@ export type MovimientoInscripcionMongo = MovimientoBase & { _id: ObjectId, razon
 export type MovimientoClaseSueltaMongo = MovimientoBase & { _id: ObjectId, razon: 'clase suelta', alumne: ObjectId, taller: ObjectId, ocasion: Date }
 export type MovimientoLiquidacionProfeMongo = MovimientoBase & { _id: ObjectId, razon: 'liquidacion profe', taller: ObjectId, mes: Date }
 
-export type MovimientoInscripcionPost = MovimientoBase & { razon: 'inscripcion', inscripcion: MongoId, mes: Date }
-export type MovimientoClaseSueltaPost = MovimientoBase & { razon: 'clase suelta', alumne: MongoId, ocasion: Date, taller: MongoId }
-export type MovimientoLiquidacionProfePost = MovimientoBase & { razon: 'liquidacion profe', taller: MongoId, mes: Date }
+export type MovimientoInscripcionPost = Omit<MovimientoBase, 'detalle'> & { razon: 'inscripcion', inscripcion: MongoId, mes: Date }
+export type MovimientoClaseSueltaPost = Omit<MovimientoBase, 'detalle'> & { razon: 'clase suelta', alumne: MongoId, ocasion: Date, taller: MongoId }
+export type MovimientoLiquidacionProfePost = Omit<MovimientoBase, 'detalle'> & { razon: 'liquidacion profe', taller: MongoId, mes: Date }
 
 export type Movimiento = { _id: MongoId } & (MovimientoGenerico | MovimientoInscripcion | MovimientoClaseSuelta | MovimientoLiquidacionProfe)
 // export type MovimientoCable = { _id: MongoId } & (MovimientoGenerico | MovimientoInscripcionCable | MovimientoClaseSueltaCable | MovimientoLiquidacionProfeCable)
 export type MovimientoMongo = { _id: ObjectId } & (MovimientoGenerico | MovimientoInscripcionMongo | MovimientoClaseSueltaMongo | MovimientoLiquidacionProfeMongo)
 export type MovimientoPost = MovimientoGenerico | MovimientoInscripcionPost | MovimientoClaseSueltaPost | MovimientoLiquidacionProfePost
-export type MovimientoPut = { _id: MongoId, detalle?: string, alumne?: MongoId, taller?: MongoId}
+export type MovimientoPut = { _id: MongoId, detalle?: string, alumne?: MongoId, taller?: MongoId }
 
 
 // Taller
@@ -110,8 +110,8 @@ export type TallerMongo = TallerBase & { _id: ObjectId }
 export type TallerPost = Omit<TallerBase, 'activo'>
 export type TallerPut = Partial<TallerBase> & { _id: MongoId }
 // export type TallerCable = TallerBase & { _id: MongoId, inscripciones: MongoId[] }
-export type Taller = TallerBase & { 
-  _id: string, 
+export type Taller = TallerBase & {
+  _id: string,
   // inscripciones: () => Inscripcion[], 
   // _inscripciones: MongoId[] 
 }
@@ -161,5 +161,5 @@ export interface Pago {
 
 export type RazonMovimiento = 'inscripcion' | 'otra' | 'clase suelta' | 'liquidacion profe'
 
-export type MedioDePago = 'efectivo' | 'mercadopago' | 'tarjeta' | 'otro' | 'no_informado' | '-'
+export type MedioDePago = 'efectivo' | 'mercadopago' | 'tarjeta' | 'transferencia' | 'otro' | 'no_informado' | '-'
 

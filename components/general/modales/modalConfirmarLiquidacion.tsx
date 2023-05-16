@@ -2,7 +2,7 @@ import { Dispatch, SetStateAction, useEffect, useState } from "react"
 import { Controles } from "../display/controles"
 import { Modal } from "../display/modal"
 import { Boton } from "../input/boton"
-import { nombres_meses } from "../../../lib/utils"
+import { nombres_meses, medios_de_pago } from "../../../lib/utils"
 import { MedioDePago, MovimientoLiquidacionProfePost, MovimientoPost, Taller } from "../../../lib/api"
 import { useBackend } from "../../context/backend"
 import { startOfMonth } from "date-fns"
@@ -28,13 +28,12 @@ export const ModalConfirmarLiquidacion = ({ monto, mes, taller, cerrar }: ModalC
     fecha: new Date(),
     razon: 'liquidacion profe',
     taller: taller._id,
-    mes: startOfMonth(mes),
-    detalle: `Liquidación ${taller.profe} para el mes de ${nombres_meses[mes.getMonth()]}`
+    mes: startOfMonth(mes)
   })
 
   const updateMedio = (m: MedioDePago) => setLiquidacion(liq => ({...liq, medio: m}))
-  const medios: MedioDePago[] = ['efectivo', 'mercadopago', 'otro']
-  const opts_medios = medios.map(m => ({v: m, txt: capitalize(m)}))
+  
+  const opts_medios = medios_de_pago.map(m => ({v: m, txt: capitalize(m)}))
 
   const liquidar = async () => {
     console.log(`Posteando liquidación:`)
