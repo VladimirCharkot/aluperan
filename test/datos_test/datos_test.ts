@@ -1,116 +1,23 @@
-import {  TallerPost, AlumnePost, Inscripcion, AsistenciaPost } from '../../lib/api';
+import { TallerPost, AlumnePost, Inscripcion, AsistenciaPost, Taller, Alumne, MovimientoInscripcion, MovimientoGenerico, MovimientoLiquidacionProfe, MovimientoClaseSuelta } from '../../lib/api';
 import { AlmacenMovimientos } from '../../lib/db/movimientos';
-import { find, flatten, random, range, sample, uniqBy } from 'lodash';
-import { eachDayOfInterval, eachMonthOfInterval } from 'date-fns';
+import { AlmacenTalleres } from '../../lib/db/talleres';
+import { AlmacenAlumnes } from '../../lib/db/alumnes';
+import { AlmacenInscripciones } from '../../lib/db/inscripciones';
+import { AlmacenAsistencias } from '../../lib/db/asistencias';
+import { find, flatten, fromPairs, random, range, sample, sampleSize, toPairs, uniqBy, values } from 'lodash';
+import { addDays, eachDayOfInterval, eachMonthOfInterval, isSameMonth, startOfMonth } from 'date-fns';
 import clientPromise from '../../lib/db/mongodb';
-import { dias_ids } from '../../lib/utils';
+import { dias_ids, medios_de_pago } from '../../lib/utils';
+import * as mock from './mock';
+import { createDecipheriv } from 'crypto';
 
-const talleres: TallerPost[] = [{
-  nombre: 'Aro',
-  profe: 'Mechita',
-  horarios: [{
-    dia: 'lun',
-    hora: '18:00hs'
-  }, {
-    dia: 'jue',
-    hora: '10:30hs'
-  }],
-  precios: [1200, 3500, 5000],
-  iniciado: new Date(2022, 8)
-}, {
-  nombre: 'Tela',
-  profe: 'Maga',
-  horarios: [{
-    dia: 'lun',
-    hora: '20:00hs'
-  }, {
-    dia: 'mie',
-    hora: '20:00hs'
-  }, {
-    dia: 'lun',
-    hora: '10:30hs'
-  }, {
-    dia: 'mie',
-    hora: '10:30hs'
-  }, {
-    dia: 'vie',
-    hora: '19:00hs'
-  }],
-  precios: [1400, 4000, 6000, 7500, 9000, 10000],
-  iniciado: new Date(2022, 6)
-}, {
-  nombre: 'Plasticidad en movimiento',
-  profe: 'Sofía Naike',
-  horarios: [{
-    dia: 'mie',
-    hora: '17:00hs'
-  }],
-  precios: [1500, 4500],
-  iniciado: new Date(2022, 9)
-}, {
-  nombre: 'Acro dúo',
-  profe: 'Pan y guineo',
-  horarios: [{
-    dia: 'mie',
-    hora: '16:30hs'
-  }],
-  precios: [1200, 3500],
-  iniciado: new Date(2022, 8)
-}, {
-  nombre: 'Trapecio',
-  profe: 'Indra Jazmin',
-  horarios: [{
-    dia: 'mar',
-    hora: '20:00hs'
-  }, {
-    dia: 'jue',
-    hora: '20:00hs'
-  },{
-    dia: 'sab',
-    hora: '12:00hs'
-  }],
-  precios: [1400, 4000, 5000, 6000],
-  iniciado: new Date(2022, 6)
-}]
+// Fecha random entre desde y ahora
+// const fecha_random = (desde: Date) => {
+//   return new Date(desde.getTime() + Math.random() * ((new Date()).getTime() - desde.getTime()));
+// }
 
-const alumnes: AlumnePost[] = [{
-  nombre: 'Macarena Olivos',
-  celular: '1122447563',
-  email: 'mac.oli.91@gmail.com'
-}, {
-  nombre: 'Elías Marqueiro',
-  celular: '1125279965'
-}, {
-  nombre: 'Juana Cervio',
-  email: 'juanix.xerxe@gmail.com'
-}, {
-  nombre: 'Camilo Sanquio',
-  celular: '1122412135'
-}, {
-  nombre: 'Esteban Ramirez',
-  email: 'este.ramaram@hotmail.com'
-}, {
-  nombre: 'Antonia Silvera',
-  celular: '1122566397',
-  email: 'antoneta@yahoo.com.ar'
-}, {
-  nombre: 'Eliana Sacarías',
-  celular: '1120235453'
-}, {
-  nombre: 'Abril Estevez',
-  email: 'bri.brist@gmail.com'
-}, {
-  nombre: 'Carla Porta',
-  email: 'erase.quesera@gmail.com',
-  celular: '1144556678'
-}, {
-  nombre: 'Fernando Miguelete',
-  email: 'ferma.92@gmail.com'
-}]
-
-const fecha_random = (desde: Date) => {
-  return new Date(desde.getTime() + Math.random() * ((new Date()).getTime() - desde.getTime()));
-}
+type AlumId = string
+type InscId = string
 
 const carga = async () => {
   const client = await clientPromise
@@ -121,82 +28,158 @@ const carga = async () => {
   client.db('aluperan_test').collection('movimientos').drop()
   client.db('aluperan_test').collection('talleres').drop()
 
+  const movimientos = new AlmacenMovimientos();
+  const talleres = new AlmacenTalleres();
+  const alumnes = new AlmacenAlumnes();
+  const inscripciones = new AlmacenInscripciones();
+  const asistencias = new AlmacenAsistencias();
 
 
-  const movimientos = new AlmacenMovimientos(await clientPromise);
+  console.log("===================================")
   console.log('Insertando talleres...')
-  const talleres_insertados = await Promise.all(talleres.map(post_taller))
+  const talleres_insertados = await Promise.all(mock.talleres.map(talleres.create)) as Taller[]
   console.log(talleres_insertados)
 
 
-
+  console.log("===================================")
   console.log('Insertando alumnes...')
-  const alumnes_insertados = await Promise.all(alumnes.map(post_alumne))
+  const alumnes_insertados = await Promise.all(mock.alumnes.map(alumnes.create)) as Alumne[]
   console.log(alumnes_insertados)
 
 
-
-  const inscripciones_al_azar = range(20).map(() => {
-    const alumne = sample(alumnes_insertados)!
-    const taller = sample(talleres_insertados)!
-    const fecha = fecha_random(taller.iniciado)
-    return {
-      alumne: alumne._id.toString(),
-      taller: taller._id.toString(),
-      dias: random(taller.horarios.length - 1) + 1,
-      iniciada: fecha
-    }
-  })
-  const inscripciones_a_insertar = uniqBy(inscripciones_al_azar, i => i.alumne + i.taller)
-
-  console.log('Insertando inscripciones...')
-  //@ts-ignore  pincha por tarfias
-  const inscripciones_insertadas: Inscripcion[] = await Promise.all(inscripciones_a_insertar.map(async (insc) => {
-    return await post_inscripcion(insc)
-  }))
+  console.log("===================================")
+  console.log('Creando inscripciones...')
+  const inscripciones_insertadas = fromPairs(await Promise.all(alumnes_insertados.map(async a => {
+    const talleres_a_inscriibir_alumne = sampleSize(talleres_insertados, random(mock.inscripcionesPorAlum))
+    const inscripciones_alumne = await Promise.all(talleres_a_inscriibir_alumne.map(t => inscripciones.create({
+      alumne: a._id,
+      taller: t._id,
+      horarios: sampleSize(t.horarios, t.horarios.length),
+      iniciada: sample(eachDayOfInterval({ start: t.iniciado, end: new Date() }))
+    }))) as Inscripcion[]
+    return [a._id, inscripciones_alumne]
+  }))) as Record<AlumId, Inscripcion[]>
   console.log(inscripciones_insertadas)
 
 
+  console.log("===================================")
+  console.log('Creando pagos de inscripciones...')
+  const pagos_inscripciones_insertados = fromPairs(await Promise.all(toPairs(inscripciones_insertadas).map(async ([id_alumne, inscripciones_alumne]) => {
+    const pagos_alumne = fromPairs(await Promise.all(inscripciones_alumne.map(i => [i._id, pagarHistoricoInscripcion(i)]))) as Record<string, MovimientoInscripcion[]>
+    return [id_alumne, pagos_alumne]
+  }))) as Record<AlumId, Record<InscId, MovimientoInscripcion[]>>
+  
+  const pagarHistoricoInscripcion = async (i: Inscripcion) => {
+    return await Promise.all( eachMonthOfInterval({ start: i.iniciada, end: new Date() }).map(mes => pagarInscripcion(i, mes))) as MovimientoInscripcion[]
+  }
+  
+  const pagarInscripcion = async (i: Inscripcion, mes: Date) => {
+    if (Math.random() < 0.05) return null
+    const t = find(talleres_insertados, t => t._id == i.taller)!
+    const f = startOfMonth(mes)
+    return await movimientos.create({
+      razon: 'inscripcion',
+      inscripcion: i._id,
+      mes: f,
+      monto: t.precios[i.horarios.length + 1],
+      medio: sample(medios_de_pago)!,
+      fecha: addDays(f, random(1, 10))
+    }) as MovimientoInscripcion
+  }
+  console.log(pagos_inscripciones_insertados)
+
+
+  console.log("===================================") 
+  console.log('Creando pagos de clases sueltas...') 
+  const pagos_sueltas_insertados = await Promise.all(range(20).map(async () => {
+    const alum = sample(alumnes_insertados)!
+    const taller = sample(talleres_insertados)!
+    const ocasion = sample(eachDayOfInterval({start: taller.iniciado, end: new Date()}))!
+    return pagarSuelta(taller, alum, ocasion)
+  }))
+  
+  const pagarSuelta = async (t: Taller, a: Alumne, ocasion: Date) => {
+    if (Math.random() < 0.05) return null
+    return await movimientos.create({
+      razon: 'clase suelta',
+      taller: t._id,
+      alumne: a._id,
+      ocasion: ocasion,
+      monto: t.precios[0],
+      medio: sample(medios_de_pago)!,
+      fecha: ocasion
+    }) as MovimientoClaseSuelta
+  }
+  console.log(pagos_sueltas_insertados)
+
+
+  console.log("===================================") 
+  console.log('Creando liquidaciones...')
+  const liquidarTallerEntero = (t: Taller) => {
+    return Promise.all(eachMonthOfInterval({start: t.iniciado, end: new Date()}).map(mes => liquidarTallerMes(t, mes)))
+  }
+  const liquidarTallerMes = (t: Taller, mes: Date) => {
+    const pagos_inscripciones_mes = flatten(flatten(values(pagos_inscripciones_insertados).map((d => values(d))))).filter(p => p.taller == t._id && isSameMonth(mes, p.mes))
+    const pagos_sueltas_mes = pagos_sueltas_insertados.filter(p => p !== null) as MovimientoClaseSuelta[]
+    const monto_inscripciones = pagos_inscripciones_mes.reduce((total, p) => total + p.monto, 0)
+    const monto_sueltas = pagos_sueltas_mes.reduce((total, p) => total + p.monto, 0)
+    return movimientos.create({
+      razon: 'liquidacion profe',
+      taller: t._id,
+      monto: (monto_inscripciones + monto_sueltas) * 0.6,
+      medio: sample(medios_de_pago)!,
+      fecha: addDays(mes, random(1,10)),
+      mes: mes
+    }) as Promise<MovimientoLiquidacionProfe>
+  }
+  const liquidaciones_insertadas = Promise.all(talleres_insertados.map(liquidarTallerEntero))
+  console.log(liquidaciones_insertadas)
+  
+  
+
+  console.log("===================================") 
+  console.log('Creando gastos...')  
+  const crearGasto = async () => {
+    return await movimientos.create({
+      razon: 'otra',
+      monto: random(1, 100) * 100,  // Entre $100 y $10000
+      medio: sample(medios_de_pago)!,
+      fecha: sample(eachDayOfInterval({start: mock.apertura, end: new Date()}))!,
+      detalle: sample(mock.motivosDeGasto)!
+    }) as MovimientoGenerico
+  }
+  const gastos_insertados = await Promise.all(range(20).map(crearGasto)) 
+  console.log(gastos_insertados)
+
+
+
+  console.log("===================================")
   console.log('Insertando asistencias...')
-  const asistencias_a_insertar = flatten(inscripciones_insertadas.map( i => {
-    return eachDayOfInterval({ start: i.iniciada, end: new Date() }).map(d => {
+
+  const asistencias_insertadas = flatten(values(inscripciones_insertadas)).map(i => {
+
+    const t = find(talleres_insertados, t => t._id == i.taller)!
+
+    eachDayOfInterval({ start: i.iniciada, end: new Date() }).map(d => {
+
       const diaSemana = dias_ids[d.getDay()]
-      const h = find(i.taller!.horarios, h => h.dia == diaSemana)
-      if(h && Math.random() < 0.9){
-        return {
-          alumne: i.alumne?._id,
-          taller: i.taller?._id,
+      const h = find(t.horarios, h => h.dia == diaSemana)
+
+      if (h && Math.random() < 0.9) {
+        asistencias.create({
+          alumne: i.alumne,
+          taller: i.taller,
           fecha: d,
-          horario: h.hora 
-        }
+          horario: h.hora
+        })
       }
+
     })
-  })).filter(a => a !== undefined) as AsistenciaPost[]
 
-  const asistencias_insertadas = await post_asistencias(asistencias_a_insertar.filter(a => a !== undefined))
+  }).filter(a => a !== undefined)
 
 
-  console.log('Insertando movimientos...')
-  const movimientos_insertados = await Promise.all(inscripciones_insertadas.map(
-    i => Promise.all(
-      eachMonthOfInterval({ start: i.iniciada, end: new Date() }).map(d => {
-        console.log(`Generando movimiento del ${d.toLocaleDateString('es-ES')} para inscripción iniciada el ${i.iniciada.toLocaleDateString('es-ES')}`)
-        if (Math.random() < 0.9){
-          const f = new Date(d.getTime() + Math.random() * 7 * 24 * 60 * 60 * 1000)
-          return movimientos.insertarPagoInscripcion({
-            monto: i.tarifas[0].monto!,
-            medio: sample(['tarjeta', 'efectivo', 'mercadopago'])!,
-            fecha: f, // una semana de rango
-            razon: 'inscripcion',
-            inscripcion: i._id.toString(),
-            mes: f,
-            detalle: ''
-          })
-        }
-      }).filter(i => i !== undefined))
-  ))
-
-  return { movimientos_insertados, inscripciones_insertadas, talleres_insertados, alumnes_insertados, asistencias_insertadas }
+  return { inscripciones_insertadas, talleres_insertados, alumnes_insertados, asistencias_insertadas, pagos_inscripciones_insertados, pagos_sueltas_insertados, liquidaciones_insertadas, gastos_insertados }
 
 }
 
@@ -208,8 +191,12 @@ carga().then(r => {
   console.log(r.talleres_insertados)
   console.log('Inscripciones:')
   console.log(r.inscripciones_insertadas)
-  console.log('Movimientos:')
-  console.log(r.movimientos_insertados)
+  console.log('Pagos inscripciones:')
+  console.log(r.pagos_inscripciones_insertados)
+  console.log('Pagos sueltas:')
+  console.log(r.pagos_sueltas_insertados)
+  console.log('Liquidaciones:')
+  console.log(r.liquidaciones_insertadas)
   console.log('Asistencias:')
   console.log(r.asistencias_insertadas)
   process.exit()

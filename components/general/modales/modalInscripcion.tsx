@@ -58,7 +58,7 @@ export const ModalInscripcion = ({ alumne, taller, cerrar }: ModalInscripcionPro
   // Talleres que no se encuentren en la lista de inscripciones del alumne
   const inscripciones_alum = alum ? lkpInscripcionesAlumne(alum).filter(i => i.activa) : []
   const talleres_disponibles = alum ?
-    talleres.filter(t => !find(inscripciones_alum, i => lkpTallerInscripcion(i)._id == t._id)) :
+    talleres.filter(t => taller?.activo && !find(inscripciones_alum, i => lkpTallerInscripcion(i)._id == t._id)) :
     talleres
 
   // Alumnes que no se encuentren en la lista de inscripciones del taller

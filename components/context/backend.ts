@@ -221,7 +221,6 @@ export const useBackend = () => {
     if (r.status == 200) setAsistencias(asts => [...asts, ...asists])
   }
 
-
   const lkpMember = <T>(coleccion: Coleccion<T>) =>
     (_id: MongoId) => find(coleccion, e => e._id == _id)!
   const lkpMembers = <T>(coleccion: Coleccion<T>, accesor: (e: T) => string) =>
@@ -229,7 +228,7 @@ export const useBackend = () => {
 
   const lkpInscripcionesAlumne = (a: Alumne) => lkpMembers(inscripciones, i => i.alumne)(a._id)
   const lkpPagosAlumne = (a: Alumne) => lkpMembers(movimientos as any[], m => m.alumne)(a._id) as Movimiento[]
-  const lkpTalleresAlumne = (t: Taller) => lkpInscripcionesAlumne(t).map(i => lkpTallerInscripcion(i))
+  const lkpTalleresAlumne = (t: Taller) => lkpInscripcionesAlumne(t).map(i => lkpTallerInscripcion(i))//.filter(t => t.activo)
 
   const lkpAlumneInscripcion = (i: Inscripcion) => lkpMember(alumnes)(i.alumne)
   const lkpTallerInscripcion = (i: Inscripcion) => lkpMember(talleres)(i.taller)
