@@ -46,7 +46,7 @@ export const ModalInscripcion = ({ alumne, taller, cerrar }: ModalInscripcionPro
   const updateTaller = (t: string | undefined) => setInscripcion(i => ({ ...i, taller: t }))
   const updateAlumne = (a: string | undefined) => setInscripcion(i => ({ ...i, alumne: a }))
 
-  const addHorario = (h: Horario) => setHorarios(hs => [...hs, h] )
+  const addHorario =    (h: Horario) => setHorarios(hs => [...hs, h] )
   const removeHorario = (h: Horario) => setHorarios(hs => hs.filter(vh => !eqHorario(vh, h)))
   const toggleHorario = (h: Horario) => { if (incluyeHorario(horarios, h)) removeHorario(h); else addHorario(h); }
 
@@ -58,7 +58,7 @@ export const ModalInscripcion = ({ alumne, taller, cerrar }: ModalInscripcionPro
   // Talleres que no se encuentren en la lista de inscripciones del alumne
   const inscripciones_alum = alum ? lkpInscripcionesAlumne(alum).filter(i => i.activa) : []
   const talleres_disponibles = alum ?
-    talleres.filter(t => taller?.activo && !find(inscripciones_alum, i => lkpTallerInscripcion(i)._id == t._id)) :
+    talleres.filter(t => t.activo && !find(inscripciones_alum, i => i.taller == t._id)) :
     talleres
 
   // Alumnes que no se encuentren en la lista de inscripciones del taller
