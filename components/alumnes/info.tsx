@@ -10,11 +10,12 @@ interface AlumneInfoProps {
 
 export const InfoAlumne = ({ alumne }: AlumneInfoProps) => {
   const { lkpInscripcionesAlumne, lkpTallerInscripcion } = useBackend()
+  const inscripciones = lkpInscripcionesAlumne(alumne)
   return (
     <>
       <h2 className="text-2xl">{alumne.nombre}</h2>
       <hr />
-      <Enumerador cabecera="Inscripciones:" coleccion={lkpInscripcionesAlumne(alumne).filter(i => i.activa)} accesor={i => `${lkpTallerInscripcion(i).nombre} (${i.horarios ? formatearHorarios(i.horarios) : 'SIN HORARIOS'})`} nodata='Sin inscripciones' />
+      <Enumerador cabecera="Inscripciones:" coleccion={inscripciones.filter(i => i.activa)} accesor={i => lkpTallerInscripcion(i) ? `${lkpTallerInscripcion(i).nombre} (${i.horarios ? formatearHorarios(i.horarios) : 'SIN HORARIOS'})` : 'Inscripción inexistente'} nodata='Sin inscripciones' />
       <Enumerador cabecera="Celular:" coleccion={alumne.celular ? [alumne.celular] : []} nodata='Sin celular' />
       <Enumerador cabecera="Mail:" coleccion={alumne.email ? [alumne.email] : []} nodata='Sin mail' />
 
