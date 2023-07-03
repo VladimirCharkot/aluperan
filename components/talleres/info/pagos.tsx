@@ -48,25 +48,34 @@ export const Pagos = ({ taller, mes }: PagosProps) => {
         <P>Fecha</P>
 
         {inscripciones.map(i => {
-          const pago = find(pagosInscripciones, p => p.inscripcion == i._id)
+          // const pago = find(pagosInscripciones, p => p.inscripcion == i._id)
+          const pagos = pagosInscripciones.filter(p => p.inscripcion == i._id)
           const nombre = lkpAlumneInscripcion(i).nombre
-          return pago ? <>
-            <p className="text-sm">✓</p>
+          return pagos.length == 1 ? <>
+            <p className="text-sm text-center">✓</p>
             <p className="text-sm">{nombre}</p>
-            <p className="text-sm">${pago.monto}</p>
-            <p className="text-sm">{pago.medio}</p>
-            <p className="text-sm">{pago.fecha.toLocaleDateString("es-ES")}</p>
-          </> : <>
-            <p className="text-sm">✗</p>
+            <p className="text-sm">${pagos[0].monto}</p>
+            <p className="text-sm">{pagos[0].medio}</p>
+            <p className="text-sm">{pagos[0].fecha.toLocaleDateString("es-ES")}</p>
+          </> : 
+          pagos.length == 0 ? <>
+            <p className="text-sm text-center">✗</p>
             <p className="text-sm">{nombre}</p>
             <p className="text-sm">-</p>
             <p className="text-sm">-</p>
             <p className="text-sm">-</p> 
-          </>
+          </> : 
+          pagos.map(p => <>
+            <p className="text-sm text-center">!</p>
+            <p className="text-sm">{nombre}</p>
+            <p className="text-sm">${p.monto}</p>
+            <p className="text-sm">{p.medio}</p>
+            <p className="text-sm">{p.fecha.toLocaleDateString("es-ES")}</p>
+          </>)
         })}
         
         { [pagosClasesSueltas.map(p => <>
-            <p className="text-sm">+</p>
+            <p className="text-sm text-center">+</p>
             <p className="text-sm">{lkpAlumne(p.alumne).nombre}</p>
             <p className="text-sm">${p.monto}</p>
             <p className="text-sm">{p.medio}</p>

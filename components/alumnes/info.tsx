@@ -3,6 +3,9 @@ import { useBackend } from "../context/backend"
 import { Enumerador } from "../general/display/enumerador"
 import { Id } from "../general/display/id"
 import { formatearHorarios } from "../../lib/utils"
+import { useState } from "react"
+import { PagosAlumne } from "./pagosAlum"
+import { Boton } from "../general/input/boton"
 
 interface AlumneInfoProps {
   alumne: Alumne
@@ -11,6 +14,10 @@ interface AlumneInfoProps {
 export const InfoAlumne = ({ alumne }: AlumneInfoProps) => {
   const { lkpInscripcionesAlumne, lkpTallerInscripcion } = useBackend()
   const inscripciones = lkpInscripcionesAlumne(alumne)
+
+  const [viendoPagos, setViendoPagos] = useState(false)
+  const toggleVerPagos = () => setViendoPagos(!viendoPagos)
+
   return (
     <>
       <h2 className="text-2xl">{alumne.nombre}</h2>
@@ -19,6 +26,9 @@ export const InfoAlumne = ({ alumne }: AlumneInfoProps) => {
       <Enumerador cabecera="Celular:" coleccion={alumne.celular ? [alumne.celular] : []} nodata='Sin celular' />
       <Enumerador cabecera="Mail:" coleccion={alumne.email ? [alumne.email] : []} nodata='Sin mail' />
 
+      <Boton texto="Pagos" color="indigo" onClick={toggleVerPagos} />
+
+      {viendoPagos && <PagosAlumne alumne={alumne}/>}
       {/* <Id id={alumne._id} /> */}
 
     </>
