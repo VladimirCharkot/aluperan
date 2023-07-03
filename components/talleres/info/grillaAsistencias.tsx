@@ -10,7 +10,7 @@ interface GrillaAsistenciasProps {
   mes: Date
 }
 
-const Ps = ({ children }: any) => <p className="text-xs">{children}</p>
+const Ps = ({ children }: any) => <p className="text-xs text-right w-full">{children}</p>
 
 export const GrillaAsistencias = ({ taller, mes }: GrillaAsistenciasProps) => {
   const { lkpInscripcionesTaller, lkpAlumneInscripcion, lkpAsistenciasAlumneTallerMes } = useBackend()
