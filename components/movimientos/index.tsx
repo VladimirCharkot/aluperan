@@ -14,6 +14,7 @@ import { Select } from "../general/input/select";
 import { P } from "../general/display/p";
 import { DatePick } from "../general/input/date";
 import { Controles } from "../general/display/controles";
+import { Row } from "../general/display/row";
 
 interface MovimientosProps {
   movimientos: Movimiento[]
@@ -30,8 +31,6 @@ export default function Movimientos() {
   const [hasta, setHasta] = useState(endOfMonth(new Date()))
   const [medio, setMedio] = useState('todos')
   const [direccion, setDireccion] = useState('ambas')
-
-  const total_en_caja = movimientos.reduce((prev, curr) => prev + curr.monto, 0)
 
   const opcs_direccion = [
     { v: 'ambas', txt: 'Todas' },
@@ -55,47 +54,26 @@ export default function Movimientos() {
   const con_direccion = (m: Movimiento) => direccion == 'ambas' || (direccion == 'entrada' ? m.monto > 0 : m.monto < 0)
   const otra_direccion = (m: Movimiento) => direccion != 'ambas' && (direccion == 'entrada' ? m.monto < 0 : m.monto > 0)
 
-  const anteriores: Movimiento = {
-    _id: '',
-    medio: '-',
-    fecha: desde,
-    razon: 'otra',
-    monto: movimientos.filter(antes).reduce((prev, curr) => prev + curr.monto, 0),
-    detalle: '[Movimientos anteriores]'
-  }
-  const posteriores: Movimiento = {
+  const movimientos_entre_fechas = movimientos.filter(entre_fechas)
+  const movimientos_en_seleccion = movimientos_entre_fechas.filter(con_medio).filter(con_direccion)
+  const movimientos_fuera_de_seleccion = [...movimientos_entre_fechas.filter(otro_medio), ...movimientos_entre_fechas.filter(otra_direccion)]
+
+  const otros: Movimiento = {
     _id: '',
     medio: '-',
     fecha: new Date(),
     razon: 'otra',
-    monto: movimientos.filter(despues).reduce((prev, curr) => prev + curr.monto, 0),
-    detalle: '[Movimientos posteriores]'
-  }
-  const otros_medios: Movimiento = {
-    _id: '',
-    medio: '-',
-    fecha: new Date(),
-    razon: 'otra',
-    monto: movimientos.filter(entre_fechas).filter(otro_medio).reduce((prev, curr) => prev + curr.monto, 0),
-    detalle: '[Otros medios]'
-  }
-  const otras_direcciones: Movimiento = {
-    _id: '',
-    medio: '-',
-    fecha: new Date(),
-    razon: 'otra',
-    monto: movimientos.filter(entre_fechas).filter(otra_direccion).reduce((prev, curr) => prev + curr.monto, 0),
-    detalle: direccion == 'entrada' ? '[Salidas]' : '[Entradas]'
+    monto: movimientos_fuera_de_seleccion.reduce((prev, curr) => prev + curr.monto, 0),
+    detalle: '[Otros]'
   }
 
-
-  const movimientos_en_rango = sortBy([
-    anteriores,
-    ...movimientos.filter(entre_fechas).filter(con_medio).filter(con_direccion),
-    ...(medio != 'todos' ? [otros_medios] : []),
-    ...(direccion != 'ambas' ? [otras_direcciones] : []),
-    posteriores
+  const movimientos_en_pantalla = sortBy([
+    ...movimientos_en_seleccion,
+    ...(medio != 'todos' || direccion != 'ambas' ? [otros] : [])
   ], m => m.fecha)
+
+  const total_en_seleccion = movimientos.filter(entre_fechas).filter(con_medio).filter(con_direccion).reduce((prev, curr) => prev + curr.monto, 0)
+  const total_en_pantalla = total_en_seleccion + otros.monto 
 
   return (
     <Lista titulo="Movimientos" bg="grilla">
@@ -113,8 +91,13 @@ export default function Movimientos() {
           <Boton texto="Ingresar" color="indigo" onClick={() => setIngresando(true)} />
           <Boton texto={borrando ? "Listo" : "Borrar"} color="red" onClick={() => setBorrando(!borrando)} />
         </Controles>
-        <CartaBalance movimientos={movimientos_en_rango} borrando={borrando} />
-        <P>Total en caja: ${total_en_caja}</P>
+        <Row>
+          <P>Balance selección: ${total_en_seleccion}</P>
+          <P>Balance período: ${total_en_pantalla}</P>
+          {/* <P>Balance histórico: ${total_en_caja}</P> */}
+        </Row>
+        <CartaBalance movimientos={movimientos_en_pantalla} borrando={borrando} />
+
       </Carta>
     </Lista>
   );
