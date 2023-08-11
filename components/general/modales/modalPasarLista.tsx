@@ -38,7 +38,7 @@ export const ModalPasarLista = ({ taller, cerrar }: ModalPasarListaProps) => {
     else setAsistencias([...asistencias, _id])
   }
 
-  const horarios = taller.horarios.filter(h => h.dia == dia)
+  const horarios = sortBy(taller.horarios.filter(h => h.dia == dia), h => h.hora)
   const horarios_opciones = horarios.map(h => ({ v: h.hora, txt: h.hora }))
   const [horario, setHorario] = useState(horarios.length == 0 ? '' : horarios[0].hora)
   const [asistencias, setAsistencias] = useState<string[]>([])
@@ -46,7 +46,7 @@ export const ModalPasarLista = ({ taller, cerrar }: ModalPasarListaProps) => {
   const texto_fecha = hoy ?
     `Hoy ${dias[dia].toLowerCase()}` :   // "hoy martes"
     (horarios.length >= 1 ?
-      `El ${dias[horarios[0].dia]} ${horarios[0].hora}` :     // "el jueves 14:00hs"
+      `El ${dias[horarios[0].dia]} ${horario}` :     // "el jueves 14:00hs"
       `El ${dias[dia]} ${fecha.toLocaleDateString('es-ES')}`) // "el lunes 13/02/23"
 
 
