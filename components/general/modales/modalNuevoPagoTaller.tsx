@@ -1,5 +1,5 @@
 import { getMonth, startOfMonth } from "date-fns"
-import { capitalize, find, last } from "lodash"
+import { capitalize, find, sortBy } from "lodash"
 import { ChangeEvent, ChangeEventHandler, useEffect, useState } from "react"
 
 import { Alumne, Inscripcion, MedioDePago, MovimientoClaseSueltaPost, MovimientoInscripcionPost, MovimientoPost, Taller } from "../../../lib/api"
@@ -27,7 +27,7 @@ const medios: MedioDePago[] = ['efectivo', 'mercadopago', 'otro']
 
 export const ModalNuevoPagoTaller = ({ cerrar, taller }: ModalNuevoPagoInscripcionInterface) => {
   const { movimientos, crearMovimiento, lkpAlumnesTaller, lkpInscripcionAlumneTaller } = useBackend()
-  const alumnesTaller = lkpAlumnesTaller(taller)
+  const alumnesTaller = sortBy(lkpAlumnesTaller(taller), a => a.nombre)
 
   const ahora = new Date()
 

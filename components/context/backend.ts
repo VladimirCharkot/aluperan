@@ -235,7 +235,7 @@ export const useBackend = () => {
   const lkpPagosInscripcion = (i: Inscripcion) => lkpMembers(movimientos as any[], m => m.inscripcion)(i._id) as Movimiento[]
 
   const lkpInscripcionesTaller = (t: Taller) => lkpMembers(inscripciones, i => i.taller)(t._id)
-  const lkpAlumnesTaller = (t: Taller) => lkpInscripcionesTaller(t).map(i => lkpAlumneInscripcion(i))
+  const lkpAlumnesTaller = (t: Taller) => lkpInscripcionesTaller(t).filter(i => i.activa).map(i => lkpAlumneInscripcion(i))
 
   const lkpMovimientosTaller = (t: Taller) => lkpMembers(movimientos as any[], m => m.taller)(t._id) as Movimiento[]
   const lkpPagosTaller = (t: Taller) => lkpMovimientosTaller(t).filter(p => p.razon == "clase suelta" || p.razon == "inscripcion") as (MovimientoClaseSuelta | MovimientoInscripcion)[]
