@@ -46,7 +46,7 @@ export const ModalPasarLista = ({ taller, cerrar }: ModalPasarListaProps) => {
   const texto_fecha = hoy ?
     `Hoy ${dias[dia].toLowerCase()}` :   // "hoy martes"
     (horarios.length >= 1 ?
-      `El ${dias[horarios[0].dia]} ${horario}` :     // "el jueves 14:00hs"
+      `El ${dias[horarios[0].dia]} ${fecha.toLocaleDateString('es-ES')} ${horario}` :     // "el jueves 14:00hs"
       `El ${dias[dia]} ${fecha.toLocaleDateString('es-ES')}`) // "el lunes 13/02/23"
 
 
