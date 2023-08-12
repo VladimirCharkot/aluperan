@@ -1,6 +1,6 @@
 import { ObjectId } from "mongodb";
 import { InscripcionPut, InscripcionPost, InscripcionMongo } from "../api";
-import { pick } from "lodash";
+import { pick, find } from "lodash";
 import { Almacen } from "./almacen";
 import { almacenAlumnes } from "./alumnes";
 import { almacenTalleres } from "./talleres";
@@ -43,6 +43,26 @@ export class AlmacenInscripciones extends Almacen<InscripcionMongo>{
     if (update.activa === false) { r = await super.update({ _id, baja: new Date() }) }
     // if (update.tarifa) { return (await ins.updateOne({ _id: _id }, { $push: { tarifas: update.tarifa } })).upsertedId }
     return r
+  }
+
+  async purgar(){
+    // Ineficiente, mejorar con pipeline
+    // Inscripciones que apuntan a un taller o alumne que ya no existe
+    const all_inscripciones = await this.getAllJoined()
+    const all_talleres = await almacenTalleres.getAllJoined()
+    const all_alumnes = await almacenAlumnes.getAllJoined()
+
+    const defectuosas = (await all_inscripciones).filter(i => 
+      !find(all_alumnes, a => i.alumne.equals(a._id)) || !find(all_talleres, t => i.taller.equals(t._id))
+    )
+
+    defectuosas.forEach(async i => {
+      if(!find(all_alumnes, a => i.alumne.equals(a._id)))
+        console.log(`Inscripcion defectuosa ${i._id}, no existe alumne ${i.alumne}, borrando...`)
+      if(!find(all_talleres, t => i.taller.equals(t._id)))
+        console.log(`Inscripcion defectuosa ${i._id}, no existe taller ${i.taller}, borrando...`)
+      if(await this.delete(i)) console.log('...ok')
+    })
   }
 
 }

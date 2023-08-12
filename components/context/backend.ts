@@ -81,8 +81,8 @@ export const useBackend = () => {
   // Recibe un setter y devuelve una función que agrega un elemento a la coleccion
   const addMember = <T>(setter: Setter<T>, hydrate: Hydrator<any, Elem<T>> = t => t) =>
     (elem: Elem<T>) => {
-      console.log(`Agregando a su colección:`)
-      console.log(hydrate(elem))
+      // console.log(`Agregando a su colección:`)
+      // console.log(hydrate(elem))
       setter(col => [...col, hydrate(elem)])
     }
 
@@ -95,15 +95,15 @@ export const useBackend = () => {
   // que recibe un _id y un updater y updatea el miembro de la coleccion con ese _id
   const updateMember = <T>(coleccion: Coleccion<T>, setter: Setter<T>) =>
     (_id: string, updater: Updater<T>) => {
-      console.log(`Buscando...`)
-      console.log(_id);
+      // console.log(`Buscando...`)
+      // console.log(_id);
       const elem = find(coleccion, e => e._id == _id)!   // Warning
-      console.log(`Aplicando update...`)
-      console.log(updater(elem))
+      // console.log(`Aplicando update...`)
+      // console.log(updater(elem))
       const updated = { ...elem, ...updater(elem) }
       const resto = coleccion.filter(e => e._id != _id)
-      console.log(`El objeto queda:`)
-      console.log(updated)
+      // console.log(`El objeto queda:`)
+      // console.log(updated)
       setter([...resto, updated])
     }
 
@@ -115,8 +115,8 @@ export const useBackend = () => {
   const deleteMember = <T>(coleccion: Coleccion<T>, setter: Setter<T>) =>
     (_id: string) => {
       {
-        console.log(`Filtrando...`)
-        console.log(_id)
+        // console.log(`Filtrando...`)
+        // console.log(_id)
         setter(coleccion.filter(e => e._id != _id))
       }
     }
@@ -228,7 +228,7 @@ export const useBackend = () => {
 
   const lkpInscripcionesAlumne = (a: Alumne) => lkpMembers(inscripciones, i => i.alumne)(a._id)
   const lkpPagosAlumne = (a: Alumne) => lkpMembers(movimientos as any[], m => m.alumne)(a._id) as Movimiento[]
-  const lkpTalleresAlumne = (t: Taller) => lkpInscripcionesAlumne(t).map(i => lkpTallerInscripcion(i))//.filter(t => t.activo)
+  const lkpTalleresAlumne = (a: Alumne) => lkpInscripcionesAlumne(a).filter(i => i.activa).map(i => lkpTallerInscripcion(i))//.filter(t => t.activo)
 
   const lkpAlumneInscripcion = (i: Inscripcion) => lkpMember(alumnes)(i.alumne)
   const lkpTallerInscripcion = (i: Inscripcion) => lkpMember(talleres)(i.taller)

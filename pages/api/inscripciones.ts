@@ -7,6 +7,8 @@ const inscripcionesRoute = async (req: NextApiRequest, res: NextApiResponse) => 
   const user = req.session.user
   if (!user || user.isLoggedIn === false) { res.status(401).json([]); return }
 
+  // await almacenInscripciones.purgar()
+
   try {
     if (req.method == 'GET') res.json(await almacenInscripciones.getAllJoined())
     if (req.method == 'POST') res.json(await almacenInscripciones.create(req.body))
