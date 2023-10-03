@@ -1,10 +1,11 @@
-import { MovimientoClaseSuelta, MovimientoInscripcion, Taller } from "../../../lib/api"
+import { Inscripcion, MovimientoClaseSuelta, MovimientoInscripcion, Taller } from "../../../lib/api"
 import { isInMonth } from "../../../lib/utils"
 import { useBackend } from "../../context/backend"
 import { P } from "../../general/display/p"
 import { Boton } from "../../general/input/boton"
 import { useEffect, useState } from "react"
 import { ModalNuevoPagoTaller } from "../../general/modales/modalNuevoPagoTaller"
+import { Check } from "../../general/input/checkbox"
 
 interface PagosProps {
   taller: Taller,
@@ -20,11 +21,17 @@ export const Pagos = ({ taller, mes }: PagosProps) => {
   )
 
   const [ingresandoPago, setIngresandoPago] = useState(false)
+  const [verInactivas, setVerInactivas] = useState(false)
 
-  const inscripciones = lkpInscripcionesTaller(taller)//.filter(i => i.activa)
+  const inscripciones = lkpInscripcionesTaller(taller) as Inscripcion[]
+  const inscripcionesActivas = lkpInscripcionesTaller(taller).filter(i => i.activa)
+  const inscripcionesInactivas = lkpInscripcionesTaller(taller).filter(i => !i.activa)
   const pagosInscripciones = pagosMes.filter(m => m.razon == 'inscripcion') as MovimientoInscripcion[]
   const pagosClasesSueltas = pagosMes.filter(m => m.razon == 'clase suelta') as MovimientoClaseSuelta[]
 
+  const pagosInactivas = pagosInscripciones
+    .filter(p => inscripcionesInactivas.map(i => i._id).includes(p.inscripcion))
+  const montoInactivas = pagosInactivas.reduce((acc, p) => acc + p.monto, 0)
 
   useEffect(() => {
     //@ts-ignore
@@ -52,27 +59,27 @@ export const Pagos = ({ taller, mes }: PagosProps) => {
         <P>Medio</P>
         <P>Fecha</P>
 
-        {inscripciones.map(i => {
+        {(verInactivas ? inscripciones : inscripcionesActivas).map(i => {
           // const pago = find(pagosInscripciones, p => p.inscripcion == i._id)
           const pagos = pagosInscripciones.filter(p => p.inscripcion == i._id)
           const nombre = lkpAlumneInscripcion(i).nombre
           return pagos.length == 1 ? <>
             <p className="text-sm text-center">✓</p>
-            <p className="text-sm">{nombre}</p>
+            <p className="text-sm">{nombre} {i.activa ? "" : "♱"}</p>
             <p className="text-sm">${pagos[0].monto}</p>
             <p className="text-sm">{pagos[0].medio}</p>
             <p className="text-sm">{pagos[0].fecha.toLocaleDateString("es-ES")}</p>
           </> :
             pagos.length == 0 ? <>
               <p className="text-sm text-center">✗</p>
-              <p className="text-sm">{nombre}</p>
+              <p className="text-sm">{nombre} {i.activa ? "" : "♱"}</p>
               <p className="text-sm">-</p>
               <p className="text-sm">-</p>
               <p className="text-sm">-</p>
             </> :
               pagos.map(p => <>
                 <p className="text-sm text-center">!</p>
-                <p className="text-sm">{nombre}</p>
+                <p className="text-sm">{nombre} {i.activa ? "" : "♱"}</p>
                 <p className="text-sm">${p.monto}</p>
                 <p className="text-sm">{p.medio}</p>
                 <p className="text-sm">{p.fecha.toLocaleDateString("es-ES")}</p>
@@ -87,6 +94,14 @@ export const Pagos = ({ taller, mes }: PagosProps) => {
           <p className="text-sm">{p.fecha.toLocaleDateString("es-ES")}</p>
         </>)]}
 
+        {!verInactivas && <>
+          <p className="text-sm text-center">♱</p>
+          <p className="text-sm">Inscripciones inactivas</p>
+          <p className="text-sm">${montoInactivas}</p>
+          <p className="text-sm"></p>
+          <p className="text-sm"></p> 
+        </>}
+
         <>
           <p className="text-sm"></p>
           <p className="text-sm border-t">Total:</p>
@@ -97,7 +112,13 @@ export const Pagos = ({ taller, mes }: PagosProps) => {
 
       </div>
 
-      <Boton texto="Ingresar pago" color="emerald" onClick={() => { setIngresandoPago(true) }} />
+      <div className="flex justify-between">
+        <Boton texto="Ingresar pago" color="emerald" onClick={() => { setIngresandoPago(true) }} />
+        <div>
+          <label className="p-2">Ver inactivas</label>
+          <Check checked={verInactivas} onClick={() => setVerInactivas(!verInactivas)}/>
+        </div>
+      </div>
 
       <hr />
     </>

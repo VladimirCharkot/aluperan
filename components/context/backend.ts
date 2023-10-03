@@ -227,6 +227,7 @@ export const useBackend = () => {
     (_id: MongoId) => coleccion.filter(e => accesor(e) == _id)
 
   const lkpInscripcionesAlumne = (a: Alumne) => lkpMembers(inscripciones, i => i.alumne)(a._id)
+  const lkpInscripcionesActivasAlumne = (a: Alumne) => lkpInscripcionesAlumne(a).filter(i => i.activa)
   const lkpPagosAlumne = (a: Alumne) => lkpMembers(movimientos as any[], m => m.alumne)(a._id) as Movimiento[]
   const lkpTalleresAlumne = (a: Alumne) => lkpInscripcionesAlumne(a).filter(i => i.activa).map(i => lkpTallerInscripcion(i))//.filter(t => t.activo)
 
@@ -242,7 +243,7 @@ export const useBackend = () => {
   const lkpLiquidacionesTaller = (t: Taller) => lkpMovimientosTaller(t).filter(p => p.razon == "liquidacion profe") as MovimientoLiquidacionProfe[]
 
   const lkpAsistenciasAlumneTallerMes = (ta: Taller, al: Alumne, mes: Date) => asistencias.filter(a => a.alumne == al._id && a.taller == ta._id && isInMonth(a.fecha, mes))
-  const lkpInscripcionAlumneTaller = (a: Alumne, t: Taller) => find(lkpInscripcionesAlumne(a), i => i.taller == t._id)!
+  const lkpInscripcionAlumneTaller = (a: Alumne, t: Taller) => find(lkpInscripcionesActivasAlumne(a), i => i.taller == t._id)!
 
   const lkpAlumne = lkpMember(alumnes)
   const lkpTaller = lkpMember(talleres)
@@ -321,7 +322,8 @@ export const useBackend = () => {
     lkpAsistenciasAlumneTallerMes,
     lkpTalleresAlumne,
     lkpAlumnesTaller,
-    lkpInscripcionAlumneTaller
+    lkpInscripcionAlumneTaller,
+    lkpInscripcionesActivasAlumne
   }
 
 }

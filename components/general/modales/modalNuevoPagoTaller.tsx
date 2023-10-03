@@ -73,7 +73,7 @@ export const ModalNuevoPagoTaller = ({ cerrar, taller }: ModalNuevoPagoInscripci
     console.log(`Array de movimientos antes:`)
     console.log(movimientos)
 
-    crearMovimiento(movimiento).then(() => {console.log(`Array de movimientos despues:`);  console.log(movimientos); cerrar()})
+    crearMovimiento(movimiento).then(cerrar)
 
   }
 

@@ -31,7 +31,7 @@ export const CartaBalance = ({ movimientos, borrando }: CartaBalanceProps) => {
           <div className={cn}>{format_curr(m.monto)}</div>
           <div className={cn}>{format_curr(movimientos.slice(0, i + 1).reduce((total, m) => total + m.monto, 0))}</div>
           <div className={cn +' col-span-3'}>{m.detalle}</div>
-          {borrando && (m._id != '' ? <Boton texto="X" color="red" onClick={() => {
+          {borrando && (m._id != '' ? <Boton addons="h-8" texto="X" color="red" onClick={() => {
             eliminarMovimiento(m)
           }} /> : <div className="w-5" />)}
         </>)
