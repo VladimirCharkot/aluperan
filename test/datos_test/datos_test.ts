@@ -123,10 +123,11 @@ const carga = async () => {
     const pagos_sueltas_mes = pagos_sueltas_insertados.filter(p => p !== null) as MovimientoClaseSuelta[]
     const monto_inscripciones = pagos_inscripciones_mes.reduce((total, p) => total + p.monto, 0)
     const monto_sueltas = pagos_sueltas_mes.reduce((total, p) => total + p.monto, 0)
+    const porcentaje_profe = (t.porcentaje_profe ?? 60) / 100
     return movimientos.create({
       razon: 'liquidacion profe',
       taller: t._id,
-      monto: (monto_inscripciones + monto_sueltas) * 0.6,
+      monto: (monto_inscripciones + monto_sueltas) * porcentaje_profe,
       medio: sample(medios_de_pago)!,
       fecha: addDays(mes, random(1,10)),
       mes: mes

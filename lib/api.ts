@@ -103,7 +103,8 @@ export type TallerBase = {
   horarios: Horario[],
   precios: number[]  // 0: clase suelta, 1: 1 día/sem, 2: 2 días/sem, etc,
   iniciado: Date,
-  activo: boolean
+  activo: boolean,
+  porcentaje_profe?: number
 }
 
 export type TallerMongo = TallerBase & { _id: ObjectId }

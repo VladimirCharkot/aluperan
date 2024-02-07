@@ -10,6 +10,7 @@ import { TituloInput } from "../general/input/tituloInput"
 import { useBackend } from "../context/backend"
 import { ModalConfirmarBaja } from "../general/modales/modalConfirmarBaja"
 import { FlexR } from "../general/display/flexR"
+import { NumberInput } from "../general/input/numberInput"
 
 type Handler = ChangeEventHandler<HTMLInputElement>
 
@@ -24,11 +25,23 @@ export const EditarTaller = ({ taller, setTaller, setEditing }: EditarTallerProp
   const [agregandoHorario, setAgregandoHorario] = useState(false);
   const [bajandoTaller, setBajandoTaller] = useState<boolean>(false);
   const [bajaConfirmada, setBajaConfirmada] = useState<boolean>(false);
+  const [nanPorcentajeProfe, setNanPorcentajeProfe] = useState<boolean>(false);
+  const [porcentajeCorrecto, setPorcentajeCorrecto] = useState<boolean>(false);
 
   const { editarTaller, editarInscripcion, lkpInscripcionesTaller, lkpAlumneInscripcion } = useBackend()
 
+  useEffect(() => {console.log(taller)}, [taller])
+
   const updateNombre: Handler = e => setTaller(t => ({ ...t, nombre: e.target.value }))
   const updateProfe: Handler = e => setTaller(t => ({ ...t, profe: e.target.value }))
+  const updatePorcentajeProfe = (n: number) => {
+    if(n < 0 || n > 100){
+      setPorcentajeCorrecto(false)
+      return
+    }
+    setPorcentajeCorrecto(true)
+    setTaller(t => ({ ...t, porcentaje_profe: n }))
+  }
   // const deleteInscripcion = (inscr: string) => setTaller(t => ({
   //   ...t,
   //   inscripciones: t.inscripciones.filter(i => i._id != inscr)
@@ -85,6 +98,12 @@ export const EditarTaller = ({ taller, setTaller, setEditing }: EditarTallerProp
       <TextInput value={taller.precios[i].toString()} onChange={(e) => updatePrecio(i, parseInt(e.target.value))} />
     </div>)}
 
+    <p className="text-xl mt-3">Porcentaje profe:</p>
+    <NumberInput value={taller.porcentaje_profe ?? 60} update={updatePorcentajeProfe} setNaN={setNanPorcentajeProfe}/>
+    {nanPorcentajeProfe && <p className="text-xs mt-3">Ingresar entre 0 y 100</p>}
+    {taller.porcentaje_profe && nanPorcentajeProfe && <p className="text-xs mt-3">Error en el porcentaje</p>}
+    {!porcentajeCorrecto && <p className="text-xs mt-3">El porcentaje debe estar entre 0 y 100</p>}
+
     <p className="text-xl mt-3">Alumnes:</p>
     {lkpInscripcionesTaller(taller).filter(i => i.activa).map(i => <div key={i._id} className="flex flex-row items-center justify-between my-2">
       <p>{lkpAlumneInscripcion(i).nombre}</p>
@@ -92,7 +111,7 @@ export const EditarTaller = ({ taller, setTaller, setEditing }: EditarTallerProp
     </div>)}
 
     <div className="flex flex-row-reverse">
-      <Boton color="indigo" texto="Listo" onClick={update} />
+      <Boton color="indigo" texto="Listo" onClick={update} activo={porcentajeCorrecto} />
     </div>
   </>)
 }

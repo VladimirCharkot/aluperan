@@ -15,7 +15,7 @@ export class AlmacenTalleres extends Almacen<TallerMongo>{
 
   async create(taller: TallerPost){
     return await super.create({
-      ...pick(taller, ['nombre', 'precios', 'profe', 'horarios', 'iniciado']),
+      ...pick(taller, ['nombre', 'precios', 'profe', 'horarios', 'iniciado', 'porcentaje_profe']),
       iniciado: taller.iniciado ?? new Date(),
       activo: true,
       inscripciones: []
@@ -25,7 +25,7 @@ export class AlmacenTalleres extends Almacen<TallerMongo>{
   async update(updates: TallerPut){
 
     const _id = new ObjectId(updates._id)
-    const r = super.update({_id, ...pick(updates, ['nombre', 'precios', 'profe', 'horarios', 'activo'])})
+    const r = super.update({_id, ...pick(updates, ['nombre', 'precios', 'profe', 'horarios', 'activo', 'porcentaje_profe'])})
 
     // Si se da de baja desactivamos también sus inscripciones
     if (updates.activo == false) {

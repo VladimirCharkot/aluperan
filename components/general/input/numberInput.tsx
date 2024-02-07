@@ -7,7 +7,7 @@ interface NumberInputProps {
 }
 
 export const NumberInput = ({ value, update, setNaN }: NumberInputProps) => {
-  const [valorTexto, setValorTexto] = useState('')
+  const [valorTexto, setValorTexto] = useState(value.toString())
 
   useEffect(() => {
     if (valorTexto != "") {

@@ -30,10 +30,12 @@ export const Liquidacion = ({ taller, mes }: LiquidacionProps) => {
     const liquidaciones_este_taller = lkpLiquidacionesTaller(taller)
     const liquidacion_mes_pendiente = liquidaciones_este_taller.filter(m => isInMonth(m.mes, mes)).length == 0
 
+    const porcentaje_profe = (taller.porcentaje_profe ?? 60) / 100
+
     return {
       total: total_recaudado_mes,
-      a_liquidar_profe: total_recaudado_mes * 0.6,
-      a_liquidar_alupe: total_recaudado_mes * 0.4,
+      a_liquidar_profe: total_recaudado_mes * porcentaje_profe,
+      a_liquidar_alupe: total_recaudado_mes * (1 - porcentaje_profe),
       pendiente: liquidacion_mes_pendiente
     }
   }
