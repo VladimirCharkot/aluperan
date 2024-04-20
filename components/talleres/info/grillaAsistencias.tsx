@@ -17,13 +17,12 @@ export const GrillaAsistencias = ({ taller, mes }: GrillaAsistenciasProps) => {
 
   // const dias = diasMesTaller(taller, mes)
   const inscripciones = lkpInscripcionesTaller(taller).filter(i => i.activa)
-  console.log(taller.nombre)
   return (<>
     {taller.horarios.map(h => {
       const dias = diasMesHorario(h, mes)
       const inscripciones_horario = inscripciones.filter(i => i.horarios ? some(i.horarios, hi => hi.dia == h.dia && hi.hora == h.hora) : false)
       return (<>
-        <P>{capitalize(h.dia)} {h.hora}</P>
+        <P>{capitalize(h.dia)} {h.hora} ({inscripciones_horario.length} inscripciones)</P>
         <div className='grid items-center justify-items-center gap-y-1 my-4' style={{
           gridTemplateColumns: `1fr repeat(${dias.length}, minmax(0, 1fr))`
         }}>

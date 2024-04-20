@@ -12,6 +12,8 @@ import { Liquidacion } from "./liquidacion"
 import { Asistencias } from "./asistencias"
 import { MesSelector } from "../../general/input/mes"
 import { FlexR } from "../../general/display/flexR"
+import { useBackend } from "../../context/backend"
+import { groupBy } from "lodash"
 
 interface InfoTallerProps {
   taller: Taller
@@ -22,6 +24,18 @@ export const InfoTaller = ({ taller }: InfoTallerProps) => {
 
   // const alumnes_con_info_de_pago = alumnes_con_info_pago(inscripciones, movimientos, taller._id)
   const [mes, setMes] = useState(new Date())
+
+  const { lkpInscripcionesTaller } = useBackend();
+
+  // Inscripciones para este taller, cada una con una lista de horarios
+  const inscripciones_taller = lkpInscripcionesTaller(taller).filter(i => i.activa)
+
+  // Inscripciones por horario
+  const inscripciones_por_horario_diferenciado = inscripciones_taller
+    .flatMap(i => i.horarios.map(h => ({...i, horario: h})))
+    
+  // Agrupadas
+  const inscripciones_por_horario = groupBy(inscripciones_por_horario_diferenciado, i => i.horario.dia + i.horario.hora)
 
   const [viendoPagos, setViendoPagos] = useState(false)
   const toggleVerPagos = () => setViendoPagos(!viendoPagos)
@@ -40,8 +54,8 @@ export const InfoTaller = ({ taller }: InfoTallerProps) => {
     </FlexR>
     <hr />
 
-    <Enumerador cabecera="Horarios:" coleccion={taller.horarios} accesor={(h: Horario) => `${dias[h.dia]} ${h.hora}`} nodata='Sin horarios' />
-    <Enumerador cabecera="Precios:" coleccion={taller.precios.map((c, i) => `${dias_semana[i]}: $${c}`)} nodata='Sin precios' />
+    <Enumerador vertical={true} cabecera="Horarios:" coleccion={taller.horarios} accesor={(h: Horario) => `${dias[h.dia]} ${h.hora} (${inscripciones_por_horario[h.dia+h.hora]?.length ?? 0} inscripciones)`} nodata='Sin horarios' />
+    {/* <Enumerador cabecera="Precios:" coleccion={taller.precios.map((c, i) => `${dias_semana[i]}: $${c}`)} nodata='Sin precios' /> */}
     {/* <Enumerador cabecera="Alumnes:" coleccion={alumnes_con_info_de_pago} accesor={a => a.nombre} nodata='Sin alumnes' decorador={a => a.mes_pago ? 'border-emerald-300' : 'border-red-300'} /> */}
     {/* <Enumerador cabecera="Inició:" coleccion={[taller.iniciado.toLocaleDateString('es-ES')]} nodata='Sin fecha de inicio' /> */}
 
