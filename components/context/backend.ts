@@ -4,7 +4,6 @@ import { find } from 'lodash';
 
 import { Alumne, AlumnePost, Asistencia, Inscripcion, MongoId, Movimiento, MovimientoClaseSuelta, MovimientoInscripcion, MovimientoLiquidacionProfe, Taller } from '../../lib/api';
 import { AppContext } from '.';
-import { read } from 'fs';
 import { isInMonth } from '../../lib/utils';
 
 

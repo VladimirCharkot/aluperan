@@ -57,7 +57,7 @@ export const EditarAlumne = ({ alumne, setAlum, setEditing }: EditarAlumneProps)
       <div className="grid grid-cols-2 gap-2 my-3">
         <p>Celular:</p>
         <TextInput value={alumne.celular ?? ''} onChange={updateCelu} />
-        <p>Mail:</p>
+        <p>Ficha médica:</p>
         <TextInput value={alumne.email ?? ''} onChange={updateMail} />
       </div>
 

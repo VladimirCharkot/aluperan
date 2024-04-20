@@ -24,7 +24,8 @@ export const InfoAlumne = ({ alumne }: AlumneInfoProps) => {
       <hr />
       <Enumerador cabecera="Inscripciones:" coleccion={inscripciones.filter(i => i.activa)} accesor={i => lkpTallerInscripcion(i) ? `${lkpTallerInscripcion(i).nombre} (${i.horarios ? formatearHorarios(i.horarios) : 'SIN HORARIOS'})` : 'Taller borrado'} nodata='Sin inscripciones' />
       <Enumerador cabecera="Celular:" coleccion={alumne.celular ? [alumne.celular] : []} nodata='Sin celular' />
-      <Enumerador cabecera="Mail:" coleccion={alumne.email ? [alumne.email] : []} nodata='Sin mail' />
+      <Enumerador cabecera="Ficha médica:" coleccion={alumne.email ? [alumne.email] : []} nodata='Sin ficha médica' />
+      {/* Nota 20/4/2024: Están usando el campo mail para ficha médica */}
 
       <Boton texto="Pagos" color="indigo" onClick={toggleVerPagos} />
 
