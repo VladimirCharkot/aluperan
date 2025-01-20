@@ -71,36 +71,36 @@ export const talleres: TallerPost[] = [{
 export const alumnes: AlumnePost[] = [{
   nombre: 'Macarena Olivos',
   celular: '1122447563',
-  email: 'mac.oli.91@gmail.com'
+  ficha: true
 }, {
   nombre: 'Elías Marqueiro',
   celular: '1125279965'
 }, {
   nombre: 'Juana Cervio',
-  email: 'juanix.xerxe@gmail.com'
+  ficha: true
 }, {
   nombre: 'Camilo Sanquio',
   celular: '1122412135'
 }, {
   nombre: 'Esteban Ramirez',
-  email: 'este.ramaram@hotmail.com'
+  ficha: true
 }, {
   nombre: 'Antonia Silvera',
   celular: '1122566397',
-  email: 'antoneta@yahoo.com.ar'
+  ficha: true
 }, {
   nombre: 'Eliana Sacarías',
   celular: '1120235453'
 }, {
   nombre: 'Abril Estevez',
-  email: 'bri.brist@gmail.com'
+  ficha: true
 }, {
   nombre: 'Carla Porta',
-  email: 'erase.quesera@gmail.com',
+  ficha: true,
   celular: '1144556678'
 }, {
   nombre: 'Fernando Miguelete',
-  email: 'ferma.92@gmail.com'
+  ficha: true
 }]
 
 export const inscripcionesPorAlum = 3

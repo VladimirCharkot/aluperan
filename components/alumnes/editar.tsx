@@ -1,4 +1,4 @@
-import { Dispatch, SetStateAction, ChangeEventHandler, useState, useEffect } from "react";
+import { Dispatch, SetStateAction, ChangeEventHandler, useState, useEffect, MouseEventHandler } from "react";
 import { TextInput } from "../general/input/textInput";
 import { Boton } from "../general/input/boton";
 import { ModalInscripcion } from "../general/modales/modalInscripcion";
@@ -10,6 +10,7 @@ import { ModalConfirmarBaja } from "../general/modales/modalConfirmarBaja";
 import { capitalize } from "lodash";
 import { formatearHorarios } from "../../lib/utils"; 
 import { ModalHorarioInscripcion } from "../general/modales/modalHorarioInscripcion";
+import { Check } from "../general/input/checkbox";
 
 export type Handler = ChangeEventHandler<HTMLInputElement>
 interface EditarAlumneProps {
@@ -28,7 +29,7 @@ export const EditarAlumne = ({ alumne, setAlum, setEditing }: EditarAlumneProps)
   const [bajando, setBajando] = useState<boolean>(false);
   const [bajaConfirmada, setBajaConfirmada] = useState<boolean>(false);
 
-  const updateMail: Handler = e => { setAlum(a => ({ ...a, email: e.target.value })) }
+  const updateFicha: MouseEventHandler<HTMLInputElement> = e => { setAlum(a => ({ ...a, ficha: !a.ficha })) }
   const updateCelu: Handler = e => { setAlum(a => ({ ...a, celular: e.target.value })) }
   const updateNombre: Handler = e => { setAlum(a => ({ ...a, nombre: e.target.value })) }
 
@@ -58,7 +59,7 @@ export const EditarAlumne = ({ alumne, setAlum, setEditing }: EditarAlumneProps)
         <p>Celular:</p>
         <TextInput value={alumne.celular ?? ''} onChange={updateCelu} />
         <p>Ficha médica:</p>
-        <TextInput value={alumne.email ?? ''} onChange={updateMail} />
+        <Check checked={alumne.ficha ?? false} onClick={updateFicha} />
       </div>
 
       <p className="text-xl mt-3">Inscripciones:</p>

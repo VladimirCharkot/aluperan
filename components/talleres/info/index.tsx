@@ -62,7 +62,7 @@ export const InfoTaller = ({ taller }: InfoTallerProps) => {
     <hr className="my-2" />
 
     <div className="flex">
-      <Boton texto="Pagos" color="indigo" onClick={toggleVerPagos} />
+      <Boton texto="Alumnes" color="indigo" onClick={toggleVerPagos} />
       <Boton texto="Asistencias" color="indigo" onClick={toggleVerAsistencias} />
       <Boton texto="Liquidaciones" color="indigo" onClick={toggleVerLiquidaciones} />
     </div>

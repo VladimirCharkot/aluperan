@@ -1,6 +1,6 @@
-import { Alumne, AlumneDel, AlumneMongo, AlumnePost, AlumnePut } from "../api";
-import { pick, isEmpty } from "lodash";
+import { pick } from "lodash";
 import { ObjectId } from "mongodb";
+import { AlumneMongo, AlumnePost, AlumnePut } from "../api";
 import { Almacen } from "./almacen";
 
 export class AlmacenAlumnes extends Almacen<AlumneMongo> {
@@ -14,7 +14,7 @@ export class AlmacenAlumnes extends Almacen<AlumneMongo> {
   }
 
   async create(alum: AlumnePost) {
-    const limpio = pick(alum, ['_id', 'nombre', 'celular', 'email'])
+    const limpio = pick(alum, ['_id', 'nombre', 'celular', 'ficha'])
     return super.create({ ...limpio, activo: true })
   }
 
@@ -30,7 +30,7 @@ export class AlmacenAlumnes extends Almacen<AlumneMongo> {
       })
     }
 
-    const limpio = pick(update, ['_id', 'nombre', 'celular', 'email', 'activo'])
+    const limpio = pick(update, ['_id', 'nombre', 'celular', 'ficha', 'activo'])
     return super.update(limpio)
   }
 

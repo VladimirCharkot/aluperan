@@ -18,7 +18,7 @@ export type MongoId = string
 export type AlumneBase = {
   nombre: string,
   celular?: string,
-  email?: string,
+  ficha?: boolean,
   activo: boolean
 }
 
