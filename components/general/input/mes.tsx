@@ -11,10 +11,11 @@ interface MesSelectorProps{
 
 export const MesSelector = ({ mes, setMes } : MesSelectorProps) => {
   const mesN = mes.getMonth()
+  const year = mes.getFullYear() == (new Date()).getFullYear() ? '' : "'" + mes.getFullYear().toString().slice(2)
 
   return <FlexR>
     <div className="cursor-pointer" onClick={() => setMes(addMonths(mes, -1))}>&lt;</div>
-    <p className="w-20 text-center">{capitalize(nombres_meses[mesN])}</p>
+    <p className="w-32 text-center">{capitalize(nombres_meses[mesN])}{year}</p>
     <div className="cursor-pointer" onClick={() => setMes(addMonths(mes, 1))}>&gt;</div>
   </FlexR>
 }
