@@ -32,7 +32,7 @@ export const InfoTaller = ({ taller }: InfoTallerProps) => {
 
   // Inscripciones por horario
   const inscripciones_por_horario_diferenciado = inscripciones_taller
-    .flatMap(i => i.horarios.map(h => ({...i, horario: h})))
+    .flatMap(i => i.horarios?.map(h => ({...i, horario: h}))).filter(x => x)
     
   // Agrupadas
   const inscripciones_por_horario = groupBy(inscripciones_por_horario_diferenciado, i => i.horario.dia + i.horario.hora)
