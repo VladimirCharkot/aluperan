@@ -16,7 +16,7 @@ async function login(req: NextApiRequest, res: NextApiResponse) {
         user = { isLoggedIn: false }
       }
 
-      // user = { isLoggedIn: true } // BORRAME
+      user = { isLoggedIn: true } // BORRAME
 
       req.session.user = user
       await req.session.save()

@@ -2,6 +2,13 @@ import {  endOfMonth, getDaysInMonth, isAfter, isBefore, isEqual, isFriday, isMo
 import { capitalize, flatten, range, some } from 'lodash';
 import { DiaSemana, Horario, MedioDePago, Taller } from './api';
 
+import { clsx, type ClassValue } from "clsx"
+import { twMerge } from "tailwind-merge"
+
+export function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs))
+}
+
 export const serialize = (obj: any[]) => JSON.parse(JSON.stringify(obj))
 
 export const dias = {
