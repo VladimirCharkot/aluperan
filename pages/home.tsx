@@ -35,7 +35,7 @@ export default function Home() {
         <link rel="icon" href="/favicon.png" />
         <link rel="stylesheet" href="/style.css" />
       </Head>
-      <div className="invisible bg-gray-200 bg-indigo-200 bg-indigo-300 border-indigo-300 border-indigo-400 border-indigo-600  bg-red-200 border-red-300 border-red-400 bg-emerald-200 border-emerald-300 border-emerald-400"></div>
+      <div className="invisible bg-gray-200 border-indigo-300"></div>
       <div className="container">
         {cambiandoPass && <ModalCambiarPass cerrar={() => setCambiandoPass(false)}/>}
         {!loggedIn && <p className='p-5'>No autorizado</p>}

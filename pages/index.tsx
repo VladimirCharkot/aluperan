@@ -1,10 +1,11 @@
 import Head from "next/head"
-import Login from "./login"
-import { LoginContext } from "../components/loginContext"
+import { useState } from "react"
+import { Toaster } from "sonner"
 import { AppContext } from "../components/context"
-import { useContext, useEffect, useState } from "react"
-import Home from './home'
+import { LoginContext } from "../components/loginContext"
 import { Alumne, Asistencia, Inscripcion, Movimiento, Taller } from "../lib/api"
+import Home from './home'
+import Login from "./login"
 
 const Index = () => {
 
@@ -38,7 +39,7 @@ const Index = () => {
         <link rel="icon" href="/favicon.png" />
         <link rel="stylesheet" href="/style.css" />
       </Head>
-      {/* {loggedIn && <p className="flex align-center justify-center">Bienvenide c:</p>} */}
+      <Toaster duration={10000}/>
       {loggedIn && <Home />}
       {!loggedIn && <Login />}
     </AppContext.Provider>

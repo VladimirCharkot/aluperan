@@ -1,9 +1,10 @@
-import { Dispatch, SetStateAction, useContext, useEffect, useState } from 'react';
 import axios from 'axios';
 import { find } from 'lodash';
+import { Dispatch, SetStateAction, useContext, useEffect, useState } from 'react';
 
-import { Alumne, AlumnePost, Asistencia, Inscripcion, MongoId, Movimiento, MovimientoClaseSuelta, MovimientoInscripcion, MovimientoLiquidacionProfe, Taller } from '../../lib/api';
+import { toast } from 'sonner';
 import { AppContext } from '.';
+import { Alumne, AlumnePost, Asistencia, Inscripcion, MongoId, Movimiento, MovimientoClaseSuelta, MovimientoInscripcion, MovimientoLiquidacionProfe, Taller } from '../../lib/api';
 import { isInMonth } from '../../lib/utils';
 
 
@@ -129,53 +130,62 @@ export const useBackend = () => {
 
   const traerElems = <T>(endpoint: string) =>
     async () => {
-      console.log('-------------------')
-      console.log(`GET ${endpoint}:`)
-      const r = await axios.get<T[]>(endpoint)
-      console.log(r.data)
-      console.log('-------------------')
-      if (r.status == 200) {
-        // setter(r.data)
-        // setEndpointsLoaded(ends => [...ends, endpoint])
+      try {
+        console.log('-------------------')
+        console.log(`GET ${endpoint}:`)
+        const r = await axios.get<T[]>(endpoint)
+        console.log(r.data)
+        console.log('-------------------')
         return r.data
+      } catch (err: any) { 
+        toast.error('Error al traer datos!', { description: err.response.data.message })
       }
-      // else flash msg
     }
 
   const crearElem = <TPost, TRet>(endpoint: string, adder: (elem: Elem<TRet>) => void) =>
     async (elem: TPost) => {
-      console.log('-------------------')
-      console.log(`POST ${endpoint}:`)
-      console.log(elem)
-      const r = await axios.post(endpoint, elem)
-      console.log(r.data)
-      console.log('-------------------')
-      if (r.status == 200) { adder(r.data) }
-      // else flash msg 
+      try {
+        console.log('-------------------')
+        console.log(`POST ${endpoint}:`)
+        console.log(elem)
+        const r = await axios.post(endpoint, elem)
+        console.log(r.data)
+        console.log('-------------------')
+        if (r.status == 200) { adder(r.data) }
+
+      } catch (err: any) {
+        toast.error('Error al crear!', { description: err.response.data.message })
+      }
     }
 
   const editarElem = <T>(endpoint: string, updater: ElemUpdater<T>) =>
     async (edit: Elem<Partial<T>>) => {
-      console.log('-------------------')
-      console.log(`PUT ${endpoint}:`)
-      console.log(edit)
-      const r = await axios.put(endpoint, edit)
-      console.log(r.data)
-      console.log('-------------------')
-      if (r.status == 200) { updater(edit._id, a => ({ ...a, ...edit })) }
-      // else flash msg
+      try {
+        console.log('-------------------')
+        console.log(`PUT ${endpoint}:`)
+        console.log(edit)
+        const r = await axios.put(endpoint, edit)
+        console.log(r.data)
+        console.log('-------------------')
+        if (r.status == 200) { updater(edit._id, a => ({ ...a, ...edit })) }
+      } catch (err: any) {
+        toast.error('Error al editar!', { description: err.response.data.message })
+      }
     }
 
   const eliminarElem = <T>(endpoint: string, deleter: (_id: string) => void) =>
     async (elem: Elem<T>) => {
-      console.log('-------------------')
-      console.log(`DELETE ${endpoint}:`)
-      console.log(elem)
-      const r = await axios.delete(endpoint, { data: { _id: elem._id } })
-      console.log(r.data)
-      console.log('-------------------')
-      if (r.status == 200) { deleter(elem._id) }
-      
+      try {
+        console.log('-------------------')
+        console.log(`DELETE ${endpoint}:`)
+        console.log(elem)
+        const r = await axios.delete(endpoint, { data: { _id: elem._id } })
+        console.log(r.data)
+        console.log('-------------------')
+        if (r.status == 200) { deleter(elem._id) }
+      } catch (err: any) {
+        toast.error('Error al eliminar!', { description: err.response.data.message })
+      }
     }
 
 

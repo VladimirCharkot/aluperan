@@ -1,14 +1,14 @@
-import { ChangeEventHandler, useContext, useEffect, useState } from "react";
 import { capitalize } from "lodash";
+import { ChangeEventHandler, useState } from "react";
 
 import { Modal } from "../display/modal";
 import { P } from "../display/p";
 import { PError } from "../display/perror";
 
 import { Boton } from "../input/boton";
-import { TextInput } from "../input/textInput";
 import { NumberInput } from "../input/numberInput";
 import { Select } from "../input/select";
+import { TextInput } from "../input/textInput";
 
 import { MedioDePago, MovimientoPost } from "../../../lib/api";
 import { useBackend } from "../../context/backend";
@@ -38,7 +38,9 @@ export const ModalMovimiento = ({ cerrar }: any) => {
   const valido = !!movimiento.monto && !!movimiento.detalle && !!movimiento.medio && !numberIsNaN
   const opts_medios = medios.map(m => ({v: m, txt: capitalize(m)}))
 
-  const postMovimiento = () => { crearMovimiento(movimiento).then(cerrar) } 
+  const postMovimiento = () => {
+    crearMovimiento(movimiento).then(cerrar)
+  } 
 
   return (
     <Modal cerrar={ cerrar }>

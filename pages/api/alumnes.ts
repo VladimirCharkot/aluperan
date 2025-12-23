@@ -13,8 +13,11 @@ const alumnesRoute = async (req: NextApiRequest, res: NextApiResponse) => {
     if (req.method == 'PUT')  res.json(await almacenAlumnes.update(req.body))
     // if (req.method == 'DELETE')   res.json(await almacenAlumnes.delete(req.body))
     if (req.method && !['GET', 'POST', 'PUT'].includes(req.method)) res.json({ mensaje: 'Método no soportado' })
-  } catch (e) {
-    console.error(e);
+  } catch (err: any) {
+    console.error(err);
+    res.status(500).json({ 
+      message: err.message || 'Error interno del servidor' 
+    });
   }
 };
 

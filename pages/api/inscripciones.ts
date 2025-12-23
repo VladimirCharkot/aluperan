@@ -14,8 +14,11 @@ const inscripcionesRoute = async (req: NextApiRequest, res: NextApiResponse) => 
     if (req.method == 'POST') res.json(await almacenInscripciones.create(req.body))
     if (req.method == 'PUT') res.json(await almacenInscripciones.update(req.body))
     if (req.method && !['POST', 'GET', 'PUT'].includes(req.method)) res.json({ mensaje: 'Método no soportado' })
-  } catch (e) {
-    console.error(e);
+  } catch (err: any) {
+    console.error(err);
+    res.status(500).json({ 
+      message: err.message || 'Error interno del servidor' 
+    });
   }
 };
 
