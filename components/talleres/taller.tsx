@@ -16,7 +16,6 @@ export const CartaTaller = ({ taller }: CartaTallerProps) => {
 
   const [editing, setEditing] = useState(false);
   const [tall, setTall] = useState(taller);
-  const [mes, setMes] = useState(new Date());
 
   useEffect(() => {
     setTall(tall)

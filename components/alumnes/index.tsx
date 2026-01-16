@@ -14,7 +14,7 @@ interface AlumnesProps {
 
 export default function Alumnes() {
   const [agregando, setAgregando] = useState(false)
-  const [verSoloActivos, setVerSoloActivos] = useState(false)
+  const [verSoloActivos, setVerSoloActivos] = useState(true)
   const [verSoloInactivos, setVerSoloInactivos] = useState(false)
   const [filtro, setFiltro] = useState('');
   const { alumnes, lkpInscripcionesActivasAlumne } = useBackend();
@@ -76,7 +76,3 @@ export default function Alumnes() {
     </Lista>
   );
 }
-
-
-
-

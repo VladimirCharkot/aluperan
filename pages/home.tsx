@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from 'react'
+import { useContext, useEffect, useRef, useState } from 'react'
 import Alumnes from '../components/alumnes'
 import Inscripciones from '../components/inscripciones'
 import Talleres from '../components/talleres'
