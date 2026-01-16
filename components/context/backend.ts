@@ -107,6 +107,16 @@ export const useBackend = () => {
       setter([...resto, updated])
     }
 
+  const upsertMembers = <T>(prev: Coleccion<T>, incoming: Coleccion<T>): Coleccion<T> => {
+    const newMap = new Map(prev.map(item => [item._id, item]));
+    
+    incoming.forEach(item => {
+      newMap.set(item._id, item); // Sobreescribe si ID existe, agrega si no
+    });
+
+    return Array.from(newMap.values());
+  };
+
   const updateAlum = updateMember(alumnes, setAlumnes)
   const updateTaller = updateMember(talleres, setTalleres)
   const updateInscripcion = updateMember(inscripciones, setInscripciones)
@@ -223,12 +233,12 @@ export const useBackend = () => {
   const traerAsistencias = async (taller: MongoId, mes: Date) => {
     const r = await axios.get(asistencias_endpoint, { params: { taller, mes } })
     const asists = r.data.map(hydrateAsis)
-    if (r.status == 200) setAsistencias(asts => [...asts, ...asists])
+    if (r.status == 200) setAsistencias(asts => upsertMembers(asts, asists))
   }
   const crearAsistencias = async (asistencias: Omit<Asistencia, '_id'>[]) => {
     const r = await axios.post(asistencias_endpoint, asistencias)
     const asists = r.data.map(hydrateAsis)
-    if (r.status == 200) setAsistencias(asts => [...asts, ...asists])
+    if (r.status == 200) setAsistencias(asts => upsertMembers(asts, asists))
   }
 
   const lkpMember = <T>(coleccion: Coleccion<T>) =>
@@ -267,11 +277,11 @@ export const useBackend = () => {
   useEffect(() => {
     if (loaded) {
       console.log(`R e a d y ~ !`)
-      console.log(`Colecciones resultantes:`)
-      console.log(alumnes)
-      console.log(talleres)
-      console.log(inscripciones)
-      console.log(movimientos)
+      // console.log(`Colecciones resultantes:`)
+      // console.log(alumnes)
+      // console.log(talleres)
+      // console.log(inscripciones)
+      // console.log(movimientos)
       setReady(true)
       //@ts-ignore
       window.alumnes = alumnes
