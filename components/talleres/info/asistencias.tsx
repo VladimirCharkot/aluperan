@@ -1,9 +1,8 @@
 import { useEffect, useState } from "react";
 import { Taller } from "../../../lib/api";
 import { useBackend } from "../../context/backend";
-import { ModalPasarLista } from "../../general/modales/modalPasarLista";
-import { FlexR } from "../../general/display/flexR";
 import { Boton } from "../../general/input/boton";
+import { ModalPasarLista } from "../../general/modales/modalPasarLista";
 import { GrillaAsistencias } from "./grillaAsistencias";
 
 interface AsistenciasProps {

@@ -1,4 +1,4 @@
-import { Inscripcion, MovimientoClaseSuelta, MovimientoInscripcion, Taller } from "../../../lib/api"
+import { Alumne, Inscripcion, MovimientoClaseSuelta, MovimientoInscripcion, Taller } from "../../../lib/api"
 import { isInMonth } from "../../../lib/utils"
 import { useBackend } from "../../context/backend"
 import { P } from "../../general/display/p"
@@ -14,7 +14,8 @@ interface PagosProps {
 
 export const Pagos = ({ taller, mes }: PagosProps) => {
 
-  const { lkpPagosTaller, lkpAlumne, lkpInscripcionesTaller, lkpAlumneInscripcion } = useBackend()
+  const { lkpPagosTaller, lkpAlumne, lkpInscripcionesTaller, lkpAlumneInscripcion, lkpAsistenciasAlumneTallerMes, traerAsistencias } = useBackend()
+
   const pagosMes = lkpPagosTaller(taller).filter(p =>
     (p.razon == 'clase suelta' && isInMonth(p.ocasion, mes))
     || (p.razon == 'inscripcion' && isInMonth(p.mes, mes))
@@ -33,89 +34,62 @@ export const Pagos = ({ taller, mes }: PagosProps) => {
     .filter(p => inscripcionesInactivas.map(i => i._id).includes(p.inscripcion))
   const montoInactivas = pagosInactivas.reduce((acc, p) => acc + p.monto, 0)
 
-  // useEffect(() => {
-  //   //@ts-ignore
-  //   window.isInMonth = isInMonth
-  //   console.log('-----------------')
-  //   console.log(taller.nombre)
-  //   console.log(mes)
-  //   console.log(`Pagos taller:`)
-  //   console.log(lkpPagosTaller(taller))
-  //   console.log(`Pagos este mes:`)
-  //   console.log(pagosMes)
-  //   console.log(`Inscripciones:`)
-  //   console.log(inscripciones)
-  //   console.log('-----------------')
-  // }, [mes])
-
+  // Traer asistencias de la DB al cambiar mes
+  useEffect(() => {
+    inscripciones.forEach(i => traerAsistencias(taller._id, mes))
+  }, [mes, taller])
 
   return (
     <>
       {ingresandoPago && <ModalNuevoPagoTaller cerrar={() => setIngresandoPago(false)} taller={taller} />}
-      <div className="grid my-4" style={{ gridTemplateColumns: '16px repeat(5, 1fr)' }}>
+      {/* <div className="text-sm grid my-4" style={{ gridTemplateColumns: '16px repeat(6, 1fr)' }}> */}
+      <div className="text-sm grid my-4 gap-x-6" style={{ gridTemplateColumns: '16px 1fr 90px 90px 90px 120px 1fr' }}>
         <p></p>
-        <P>Alumne</P>
-        <P>Ficha médica</P>
-        <P>Pago</P>
-        <P>Medio</P>
-        <P>Fecha</P>
+        <p className="p-4 ">Alumne</p>
+        <p className="p-4 text-center">Asistencias</p>
+        <p className="p-4 text-center">Ficha</p>
+        <p className="p-4 text-right">Pago</p>
+        <p className="p-4 ">Medio</p>
+        <p className="p-4 text-left">Fecha</p>
 
-        {(verInactivas ? inscripciones : inscripcionesActivas).map(i => {
-          const pagos = pagosInscripciones.filter(p => p.inscripcion == i._id)
-          const alum = lkpAlumneInscripcion(i)
-          const nombre = alum.nombre
-          const ficha = alum.ficha
-          return pagos.length == 1 ? <>
-            <p className="text-sm text-center">✓</p>
-            <p className="text-sm">{nombre} {i.activa ? "" : "♱"}</p>
-            <p className="text-sm">{ ficha ? '✓' : '✗' }</p>
-            <p className="text-sm">${pagos[0].monto}</p>
-            <p className="text-sm">{pagos[0].medio}</p>
-            <p className="text-sm">{pagos[0].fecha.toLocaleDateString("es-ES")}</p>
-          </> :
-            pagos.length == 0 ? <>
-              <p className="text-sm text-center">✗</p>
-              <p className="text-sm">{nombre} {i.activa ? "" : "♱"}</p>
-              <p className="text-sm">{ ficha ? '✓' : '✗' }</p>
-              <p className="text-sm">-</p>
-              <p className="text-sm">-</p>
-              <p className="text-sm">-</p>
-            </> :
-              pagos.map(p => <>
-                <p className="text-sm text-center">!</p>
-                <p className="text-sm">{nombre} {i.activa ? "" : "♱"}</p>
-                <p className="text-sm">{ ficha ? '✓' : '✗' }</p>
-                <p className="text-sm">${p.monto}</p>
-                <p className="text-sm">{p.medio}</p>
-                <p className="text-sm">{p.fecha.toLocaleDateString("es-ES")}</p>
-              </>)
-        })}
+        {(verInactivas ? inscripciones : inscripcionesActivas).map(
+          // Puede haber varios pagos para una misma inscripción en el mes
+          insc => <FilaInscripcion key={insc._id} inscripcion={insc} pagos={pagosInscripciones.filter(p => p.inscripcion == insc._id)} taller={taller} mes={mes} />
+        )}
 
+        {/* Clases sueltas */}
         {[pagosClasesSueltas.map(p => <>
-          <p className="text-sm text-center">+</p>
-          <p className="text-sm">{ lkpAlumne(p.alumne).nombre }</p>
-          <p className="text-sm">{ lkpAlumne(p.alumne).ficha ? '✓' : '✗'}</p>
-          <p className="text-sm">${p.monto}</p>
-          <p className="text-sm">{p.medio}</p>
-          <p className="text-sm">{p.fecha.toLocaleDateString("es-ES")}</p>
+          <p className="text-center">+</p>
+          <p className="">{lkpAlumne(p.alumne).nombre}</p>
+          <p className="text-center">{lkpAsistenciasAlumneTallerMes(taller, { _id: p.alumne } as Alumne, mes).length}</p>
+          <p className="text-center">{lkpAlumne(p.alumne).ficha ? '✓' : '✗'}</p>
+          <p className="text-right">${p.monto}</p>
+          <p className="text-left">{p.medio}</p>
+          <p className="text-left">{p.fecha.toLocaleDateString("es-ES")}</p>
         </>)]}
 
+        {/* Inscripciones inactivas header */}
         {!verInactivas && <>
-          <p className="text-sm text-center">♱</p>
-          <p className="text-sm">Inscripciones inactivas</p>
-          <p className="text-sm"></p>
-          <p className="text-sm">${montoInactivas}</p>
-          <p className="text-sm"></p>
-          <p className="text-sm"></p> 
+          <p className="text-center">♱</p>
+          <p className="">Inscripciones inactivas</p>
+          <p className="text-center"></p>
+          <p className="text-center"></p>
+          <p className="text-right">${montoInactivas}</p>
+          <p className=""></p>
+          <p className="text-left"></p>
         </>}
 
+        {/* Total */}
         <>
-          <p className="text-sm"></p>
-          <p className="text-sm"></p>
-          <p className="text-sm border-t">Total:</p>
-          <p className="text-sm border-t">${pagosMes.reduce((total, pago) => pago.monto + total, 0)}</p>
-          <p className="text-sm border-t"></p>
-          <p className="text-sm border-t"></p>
+          <p className=""></p>
+          <p className=""></p>
+          <p className=""></p>
+          <p className="border-t"></p>
+          <p className="text-right border-t flex gap-8 justify-end">
+            <span>Total:</span>
+            <span>${pagosMes.reduce((total, pago) => pago.monto + total, 0)}</span></p>
+          <p className="border-t"></p>
+          <p className="border-t"></p>
         </>
 
       </div>
@@ -124,11 +98,45 @@ export const Pagos = ({ taller, mes }: PagosProps) => {
         <Boton texto="Ingresar pago" color="emerald" onClick={() => { setIngresandoPago(true) }} />
         <div>
           <label className="p-2">Ver inactivas</label>
-          <Check checked={verInactivas} onClick={() => setVerInactivas(!verInactivas)}/>
+          <Check checked={verInactivas} onClick={() => setVerInactivas(!verInactivas)} />
         </div>
       </div>
 
       <hr />
     </>
   )
+}
+
+function Fila({ cols }: { cols: [string, string, string, string, string, string, string] }) {
+  return <>
+    <span className="text-center">{cols[0]}</span>
+    <span className="">{cols[1]}</span>
+    <span className="text-center">{cols[2]}</span>
+    <span className="text-center">{cols[3]}</span>
+    <span className="text-right">{cols[4]}</span>
+    <span className="text-left">{cols[5]}</span>
+    <span className="text-left">{cols[6]}</span>
+  </>
+}
+
+function FilaInscripcion({ pagos, inscripcion, taller, mes }: { pagos?: MovimientoInscripcion[], inscripcion: Inscripcion, taller: Taller, mes: Date }) {
+
+  const { lkpAlumneInscripcion, lkpAsistenciasAlumneTallerMes } = useBackend()
+
+  const alum = lkpAlumneInscripcion(inscripcion)
+  const asistencias = lkpAsistenciasAlumneTallerMes(taller, alum, mes).length
+
+  const nombre = alum.nombre
+  const ficha = alum.ficha ? '✓' : '✗'
+  const nombreDisplay = nombre + (inscripcion.activa ? "" : "♱")
+
+  if (!pagos || pagos.length == 0)
+    return <Fila cols={['✗', nombreDisplay, asistencias.toString(), ficha, '-', '-', '-']} />
+
+  if (pagos.length == 1)
+    return <Fila cols={['✓', nombreDisplay, asistencias.toString(), ficha, `$${pagos[0].monto}`, pagos[0].medio, pagos[0].fecha.toLocaleDateString("es-ES")]} />
+
+  // Varios pagos, varias filas
+  return pagos.map(p => <Fila cols={['!', nombreDisplay, asistencias.toString(), ficha, `$${p.monto}`, p.medio, p.fecha.toLocaleDateString("es-ES")]} />)
+
 }
