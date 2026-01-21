@@ -14,6 +14,7 @@ import { MesSelector } from "../../general/input/mes"
 import { FlexR } from "../../general/display/flexR"
 import { useBackend } from "../../context/backend"
 import { groupBy } from "lodash"
+import { Icon } from "@iconify/react"
 
 interface InfoTallerProps {
   taller: Taller
@@ -49,22 +50,21 @@ export const InfoTaller = ({ taller }: InfoTallerProps) => {
 
   return (<>
     <FlexR justify="between">
-      <h2 className="text-2xl">{taller.nombre} - {taller.profe}</h2>
+      <h2 className="text-3xl font-bold bg-emerald-100 p-3 rounded-xl">{taller.nombre} - {taller.profe}</h2>
       <MesSelector mes={mes} setMes={setMes}/>
     </FlexR>
-    <hr />
+    
 
-    <Enumerador vertical={true} cabecera="Horarios:" coleccion={taller.horarios} accesor={(h: Horario) => `${dias[h.dia]} ${h.hora} (${inscripciones_por_horario[h.dia+h.hora]?.length ?? 0} inscripciones)`} nodata='Sin horarios' />
+    <Enumerador vertical={true} cabecera="Horarios:" coleccion={taller.horarios} accesor={(h) => `${dias[h.dia]} ${h.hora} (${inscripciones_por_horario[h.dia+h.hora]?.length ?? 0} inscripciones)`} nodata='Sin horarios' />
     {/* <Enumerador cabecera="Precios:" coleccion={taller.precios.map((c, i) => `${dias_semana[i]}: $${c}`)} nodata='Sin precios' /> */}
     {/* <Enumerador cabecera="Alumnes:" coleccion={alumnes_con_info_de_pago} accesor={a => a.nombre} nodata='Sin alumnes' decorador={a => a.mes_pago ? 'border-emerald-300' : 'border-red-300'} /> */}
     {/* <Enumerador cabecera="Inició:" coleccion={[taller.iniciado.toLocaleDateString('es-ES')]} nodata='Sin fecha de inicio' /> */}
 
-    <hr className="my-2" />
 
     <div className="flex">
-      <Boton texto="Alumnes" color="indigo" onClick={toggleVerPagos} />
-      <Boton texto="Asistencias" color="indigo" onClick={toggleVerAsistencias} />
-      <Boton texto="Liquidaciones" color="indigo" onClick={toggleVerLiquidaciones} />
+      <Boton iconor={<Icon icon={viendoPagos ? "mingcute:up-fill" : "mingcute:down-fill"}/>} texto="Alumnes" color={viendoPagos? "emerald":"indigo"} onClick={toggleVerPagos} />
+      <Boton iconor={<Icon icon={viendoAsistencias ? "mingcute:up-fill" : "mingcute:down-fill"}/>} texto="Asistencias" color={viendoAsistencias? "emerald":"indigo"} onClick={toggleVerAsistencias} />
+      <Boton iconor={<Icon icon={viendoLiquidaciones ? "mingcute:up-fill" : "mingcute:down-fill"}/>} texto="Liquidaciones" color={viendoLiquidaciones? "emerald":"indigo"} onClick={toggleVerLiquidaciones} />
     </div>
 
     {viendoPagos && <Pagos taller={taller} mes={mes} />}

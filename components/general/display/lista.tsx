@@ -6,10 +6,10 @@ interface ListaProps{
   bg: string
 }
 
-export const Lista = ({ titulo, children, bg }: any) => {
+export const Lista = ({ titulo, children, bg }: ListaProps) => {
   return (
     <div className={`${bg} h-screen w-full overflow-y-scroll`}>
-      <h1 className="text-3xl p-4 text-rye">{titulo}</h1>
+      <h1 className="text-3xl p-10 text-center md:text-6xl text-rye">{titulo}</h1>
       <ul>
         {children}
       </ul>

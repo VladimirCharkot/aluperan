@@ -1,18 +1,26 @@
-interface BotonProps {
+import { cn } from "@/lib/utils"
+import { ButtonHTMLAttributes, ReactNode } from "react"
+
+interface BotonProps extends ButtonHTMLAttributes<HTMLButtonElement>  {
   texto: string,
+  iconol?: ReactNode,
+  iconor?: ReactNode,
   onClick: () => void,
   color: string,
   addons?: string,
   activo?: boolean
 }
 
-export const Boton = ({texto, color, onClick, addons, activo}: BotonProps) => {
+export const Boton = ({texto, color, onClick, addons, activo, iconol, iconor}: BotonProps) => {
   const act = activo === undefined || activo === true
   const c = act ? color : 'gray'  
   return (
-    <div className={`cursor-pointer bg-${c}-200 hover:border-${c}-400 border-2 border-${c}-300 active:border border-t-0 border-l-0 px-2 py-1 m-1 rounded w-max ${addons ?? ''}`}
-         onClick={() => { if (act) onClick() }}>
-      {texto}
+<div className={cn(
+        "flex items-center cursor-pointer border-2 border-t-0 border-l-0 px-2 py-1 m-1 rounded gap-2 w-max",
+        `bg-${c}-200 hover:border-${c}-400 border-${c}-300 active:border`,
+        addons
+      )}         onClick={() => { if (act) onClick() }}>
+      {iconol}{texto}{iconor}
     </div>
   )
 }

@@ -7,6 +7,7 @@ import { ModalNuevoTaller } from "../general/modales/modalNuevoTaller";
 import { AppContext } from "../context";
 import { FlexR } from "../general/display/flexR";
 import { sortBy } from "lodash";
+import { Icon } from '@iconify/react';
 
 export default function Talleres() {
   const { talleres } = useContext(AppContext);
@@ -29,13 +30,11 @@ export default function Talleres() {
       {agregando && <ModalNuevoTaller cerrar={cerrarModal} />}
 
       {/* Menú */}
-      <FlexR justify="between">
-        <Boton texto="Agregar" color="indigo" onClick={abrirModal} addons="mx-5" />
-        <FlexR>
-          <p>Buscar:</p>
-          <input className="mx-6" value={filtro} onChange={e => setFiltro(e.target.value)} />
-        </FlexR>
-      </FlexR>
+        <div className="flex bg-white w-fit p-4 rounded-xl items-center mx-6 justify-center">
+          <p className="flex gap-2 font-bold"> <Icon className="h-5 w-5" icon={"mingcute:search-line"} /> Buscar:</p>
+          <input className="border-b-2" value={filtro} onChange={e => setFiltro(e.target.value)} />
+        <Boton iconol={<Icon className="h-5 w-5" icon={"ic:round-plus"}/>} texto="Agregar taller" color="indigo" onClick={abrirModal} addons="mx-5" />
+          </div>
       
       {talleres && talleres_mostrados.map((a) => (
         <CartaTaller key={a._id} taller={a} />

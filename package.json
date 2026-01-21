@@ -7,6 +7,7 @@
     "init_db": "npx ts-node test/datos_test.ts"
   },
   "dependencies": {
+    "@iconify/react": "^6.0.2",
     "@tailwindcss/cli": "^4.1.18",
     "@tailwindcss/postcss": "^4.0.0",
     "@types/axios": "^0.14.0",

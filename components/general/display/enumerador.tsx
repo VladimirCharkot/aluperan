@@ -1,34 +1,27 @@
-interface EnumeradorProps {
+import { cn } from "@/lib/utils"
+
+interface EnumeradorProps<T> {
   cabecera: string,
-  coleccion: any[],
+  coleccion: T[],
   nodata: string,
-  accesor?: (i: any) => string,
-  decorador?: (i: any) => string,
+  accesor?: (i: T) => string,
+  decorador?: (i: T) => string,
   vertical?: boolean
 }
 
-export const Enumerador = ({ cabecera, coleccion, accesor, nodata, decorador, vertical = false }: EnumeradorProps) => {
+export const Enumerador = <T,>({ cabecera, coleccion, accesor, nodata, decorador, vertical = false }: EnumeradorProps<T>) => {
   return (
     <>
-      <div className="invisible border-red-300 border-emerald-300" />
-      {coleccion.length > 0 && !vertical && (
-        <ul className="p-2 bg-pink flex flex-row flex-wrap items-center">
-          <p>{cabecera}</p>
+      {coleccion.length > 0 && (
+        <ul className={cn("p-4 ml-6 border-2 border-emerald-100 m-2 rounded-xl flex", !vertical && "flex-row flex-wrap items-center", vertical && "flex-col items-start")}>
+          <p className="font-bold text-2xl">{cabecera}</p>
           {coleccion.map((i, idx) => <li
-            className={(decorador !== undefined ? decorador(i) : 'border-slate-300 ') +
-              ' rounded border-t-0 border-l-0 border-r-0 px-1 mx-2 border-2 m-2 '}
-            key={idx}>{accesor ? accesor(i) : i}</li>)}
+            className={cn(
+              'border-slate-300 rounded border-b-2 border-dashed p-1 px-2 mx-2 m-2',
+              decorador && decorador(i)
+            )}
+            key={idx}>{accesor ? accesor(i) : i as string}</li>)}
         </ul>)}
-
-      {coleccion.length > 0 && vertical && (<>
-        <p>{cabecera}</p>
-        <ul className="p-2 bg-pink flex flex-col items-start">
-          {coleccion.map((i, idx) => <li
-            className={(decorador !== undefined ? decorador(i) : 'border-slate-300 ') +
-              ' rounded border-t-0 border-l-0 border-r-0 px-1 mx-2 border-2 m-2 '}
-            key={idx}>{accesor ? accesor(i) : i}</li>)}
-        </ul>
-      </>)}
 
       {coleccion.length == 0 && (<p className="p-2">{nodata}</p>)}
     </>

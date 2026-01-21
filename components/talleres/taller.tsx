@@ -7,6 +7,7 @@ import { EditarTaller } from './editar';
 import { Controles } from "../general/display/controles";
 import { Boton } from "../general/input/boton";
 import { MesSelector } from "../general/input/mes";
+import { Icon } from "@iconify/react";
 
 interface CartaTallerProps {
   taller: Taller
@@ -28,7 +29,7 @@ export const CartaTaller = ({ taller }: CartaTallerProps) => {
       {editing && <EditarTaller taller={tall} setTaller={setTall} setEditing={setEditing} />}
 
       <Controles>
-      {!editing && <Boton color="indigo" texto="Editar" onClick={() => { setEditing(true); }} />}
+      {!editing && <Boton iconol={<Icon icon={"nimbus:edit"}/>} color="indigo" texto="Editar" onClick={() => { setEditing(true); }} />}
       </Controles>
     </Carta>
 
