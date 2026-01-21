@@ -46,7 +46,7 @@ export const Liquidacion = ({ taller, mes }: LiquidacionProps) => {
           cerrar={() => setViendoModalLiquidacion(false)}
         />
       )}
-<div className=" bg-indigo-50 p-4 my-10 rounded-xl">
+<div className=" bg-indigo-50/90 p-4 my-10 rounded-xl">
       <p className="text-2xl bg-indigo-200/90 p-2 w-fit rounded">
         Info de liquidación para el mes anterior (<strong>{nombres_meses[mes.getMonth()]}</strong>)
       </p>
@@ -55,8 +55,8 @@ export const Liquidacion = ({ taller, mes }: LiquidacionProps) => {
         <TableHeader>
           <TableRow className="text-lg">
             <TableHead>Recaudado</TableHead>
-            <TableHead>Liquidación profe</TableHead>
-            <TableHead>Liquidación alupe</TableHead>
+            <TableHead>Liquidación Profe</TableHead>
+            <TableHead>Liquidación Alupe</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -68,13 +68,13 @@ export const Liquidacion = ({ taller, mes }: LiquidacionProps) => {
         </TableBody>
       </Table>
 
-      <div className="flex items-center mt-4">
-        {pendiente && (
-          <Boton texto="Liquidar" color="emerald" onClick={() => setViendoModalLiquidacion(true)} />
-        )}
+      <div className="flex flex-col justify-center items-center mt-4">
         <p className={`text-sm mx-5 font-bold`}>
           Estado de liquidación: <span className={`${pendiente? 'text-rose-500':'text-emerald-500'}`}>{pendiente ? '❌ Pendiente' : '✅ Hecha'}</span>
         </p>
+        {pendiente && (
+          <Boton texto="Liquidar" color="indigo" onClick={() => setViendoModalLiquidacion(true)} />
+        )}
       </div>
 
       </div>

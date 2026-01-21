@@ -16,7 +16,7 @@ export const Boton = ({texto, color, onClick, addons, activo, iconol, iconor}: B
   const c = act ? color : 'gray'  
   return (
 <div className={cn(
-        "flex items-center cursor-pointer border-2 border-t-0 border-l-0 px-2 py-1 m-1 rounded gap-2 w-max",
+        "flex items-center cursor-pointer border-4 border-t border-l px-2 py-1 m-1 rounded gap-2 w-max",
         `bg-${c}-200 hover:border-${c}-400 border-${c}-300 active:border`,
         addons
       )}         onClick={() => { if (act) onClick() }}>
