@@ -9,6 +9,7 @@ import { startOfMonth } from "date-fns"
 import { P } from "../display/p"
 import { Select } from "../input/select"
 import { capitalize } from "lodash"
+import { Icon } from "@iconify/react"
 
 interface ModalConfirmarLiquidacionProps {
   monto: number,
@@ -51,13 +52,15 @@ export const ModalConfirmarLiquidacion = ({ monto, mes, taller, cerrar }: ModalC
 
   return (
     <Modal cerrar={() => { setLiquidacionConfirmada(false); cerrar() }}>
-      <P>Confirmar la liquidación implica el pago del monto del mes que cerró (${monto} por {nombres_meses[mes.getMonth()]}) a el/la profe del taller ({taller.profe})</P>
-      <P>Medio:</P> 
+      <p className="text-center m-4"> Confirmar la liquidación implica el pago del monto del mes que cerró (${monto} por {nombres_meses[mes.getMonth()]}) a el/la profe del taller ({taller.profe})</p>
+      <div className="flex flex-col m-4">
+      <p className="mt-4 font-bold text-xl">Medio de pago:</p> 
       <Select onChange={e => updateMedio(e.target.value as MedioDePago)} opts={opts_medios}/>
-      <Controles>
-        <Boton texto="Pagar y confirmar" onClick={() => { setLiquidacionConfirmada(true); }} color="emerald" />
+      <div className="flex justify-center">
+        <Boton texto="Confirmar Pago" onClick={() => { setLiquidacionConfirmada(true); }} color="emerald" />
         <Boton texto="Cancelar" onClick={() => { setLiquidacionConfirmada(false); cerrar(); }} color="red" />
-      </Controles>
+      </div>
+      </div>
     </Modal>
   )
 }
