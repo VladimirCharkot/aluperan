@@ -10,7 +10,7 @@ interface DatePickProps{
 export const DatePick = ({fecha, setFecha, shiftHoras} : DatePickProps) => {
 
   return (
-    <input style={{ minHeight: '30px' }} type="date" value={fecha.toISOString().split("T")[0]} onChange={e => {
+    <input className="bg-indigo-50 p-2 rounded-xl" style={{ minHeight: '30px' }} type="date" value={fecha.toISOString().split("T")[0]} onChange={e => {
       setFecha(addHours(new Date(e.target.value), shiftHoras ?? 0))  // Ajustando locale
     }} />
   )

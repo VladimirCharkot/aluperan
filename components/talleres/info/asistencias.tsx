@@ -20,10 +20,9 @@ export const Asistencias = ({ taller, mes }: AsistenciasProps) => {
   const abrirLista = () => setPasandoLista(true)
   const cerrarLista = () => setPasandoLista(false)
 
-  return <>
+  return <div className="flex flex-col items-center">
     {pasandoLista && <ModalPasarLista taller={taller} cerrar={cerrarLista} />}
     <GrillaAsistencias taller={taller} mes={mes} />
-      <Boton texto="Pasar lista" color="emerald" onClick={abrirLista} />
-    <hr />
-  </>
+    <Boton texto="Pasar lista" color="emerald" onClick={abrirLista} />
+  </div>
 }
