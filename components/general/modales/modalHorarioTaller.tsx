@@ -5,7 +5,7 @@ import { dias, horarios } from "../../../lib/utils";
 import { entries } from "lodash";
 import { Taller, DiaSemana } from "../../../lib/api";
 
-interface ModalHorarioProps{
+interface ModalHorarioProps {
   setTaller: Dispatch<SetStateAction<Taller>>,
   cerrar: () => void
 }
@@ -18,28 +18,36 @@ export const ModalHorarioTaller = ({ setTaller, cerrar }: ModalHorarioProps) => 
   const [hora, setHora] = useState<string>('9:00')
 
   const agregarHorario = () => {
-    setTaller(t => ({...t, 
-      horarios: [...t.horarios, {dia: dia as DiaSemana, hora}],
+    setTaller(t => ({
+      ...t,
+      horarios: [...t.horarios, { dia: dia as DiaSemana, hora }],
       precios: [...t.precios, 0]
     }))
     cerrar()
   }
 
   return (
-    <Modal cerrar={ cerrar }>
-        <p className='p-4'>Día:</p>
-        <select className='p-4' onChange={e => setDia(e.target.value)}>
-          <option value={undefined}></option>
-          {entries(dias).map(([d, dia]) => <option key={d} value={d}>{dia}</option>)}
-        </select>
+    <Modal cerrar={cerrar}>
+      <div className="flex flex-col items-center">
+        <div className="flex flex-col w-full gap-2">
+          <p className="text-xl">Nuevo horario</p>
+          <p className='flex gap-2 items-center p-4'>Día:
+            <select className='bg-indigo-50 p-2 rounded w-full' onChange={e => setDia(e.target.value)}>
+              <option value={undefined}></option>
+              {entries(dias).map(([d, dia]) => <option key={d} value={d}>{dia}</option>)}
+            </select>
+          </p>
 
-        <p className='p-4'>Horario:</p>
-        <select className='p-4' onChange={e => setHora(e.target.value)}>
-          <option value={undefined}></option>
-          {horarios.map(h => <option key={h} value={h}>{h}</option>)}
-        </select>
+          <p className='flex gap-2 items-center p-4'>Hora:
+            <select className='bg-indigo-50 p-2 rounded w-full' onChange={e => setHora(e.target.value)}>
+              <option value={undefined}></option>
+              {horarios.map(h => <option key={h} value={h}>{h}</option>)}
+            </select>
+          </p>
+        </div>
 
-        <Boton addons='ml-auto' texto='Agregar' color='emerald' onClick={agregarHorario} />
+        <Boton texto='Agregar' color='emerald' onClick={agregarHorario} />
+      </div>
     </Modal>
   )
 }
