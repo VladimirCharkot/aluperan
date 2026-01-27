@@ -6,4 +6,4 @@ interface TextInputProps{
 }
 
 export const TextInput = ({value, onChange} : TextInputProps) => 
-  <input className="bg-transparent border-b outline-none" value={value} onChange={onChange}/>
+  <input className="border-b" value={value} onChange={onChange}/>
