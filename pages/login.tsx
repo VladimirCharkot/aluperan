@@ -45,17 +45,19 @@ export default function Login() {
 
   return (
     <>
-      <div className="login flex items-center justify-center h-screen bg-indigo-200">
-        <form onSubmit={handleSend}>
-          <input className="border p-2" type="password" name="password" onChange={e => setPass(e.target.value)}/>
-          <Boton texto="Login" onClick={login} color="emerald" />
+      <div className="login flex flex-col items-start justify-center h-screen bg-indigo-200">
+        <form className='p-16 bg-white/50 border-2 border-indigo-500 rounded-xl items-center flex flex-col m-70' onSubmit={handleSend}>
+          <h1 className='text-3xl text-indigo-500'>¡Bienvenide!</h1>
+          <p className='m-6'>Ingresa con tu password</p>
+          <input className="border-2 border-indigo-500 rounded bg-indigo-300 p-2 mb-6" type="password" name="password" onChange={e => setPass(e.target.value)}/>
+          <Boton addons='bg-indigo-300 border-indigo-600' texto="Login" onClick={login} color="indigo" />
           <p className='text-red-400 p-2 text-sm'>{errorMsg}</p>
           <p className='text-emerald-400 p-2 text-sm'>{successMsg}</p>
         </form>
       </div>
       <style jsx>{`
         .login{
-          background-image: url(/alupe.png);
+          background-image: url(/alupe2.png);
           background-size: 50%;
           background-repeat: no-repeat;
           background-blend-mode: overlay;
