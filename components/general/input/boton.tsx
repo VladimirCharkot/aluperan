@@ -19,7 +19,7 @@ export const Boton = ({texto, color, onClick, addons, activo, iconol, iconor}: B
         "flex items-center cursor-pointer border-4 border-t border-l px-2 py-1 m-1 rounded gap-2 w-max",
         `bg-${c}-200 hover:border-${c}-400 border-${c}-300 active:border`,
         addons
-      )}         onClick={() => { if (act) onClick() }}>
+      )}onClick={() => { if (act) onClick() }}>
       {iconol}{texto}{iconor}
     </div>
   )
