@@ -30,10 +30,10 @@ export default function Talleres() {
       {agregando && <ModalNuevoTaller cerrar={cerrarModal} />}
 
       {/* Menú */}
-        <div className="flex bg-white  p-4 rounded-xl items-center mx-6 justify-between">
-          <p className="flex gap-2 font-bold"> <Icon className="h-5 w-5" icon={"mingcute:search-line"} /> 
+        <div className="flex bg-white p-4 rounded-xl items-center mx-6 justify-between">
+          <p className="flex gap-2 w-2/3 font-bold"> <Icon className="h-5 w-5" icon={"mingcute:search-line"} /> 
           Buscar:
-          <input className="border-b-2" value={filtro} onChange={e => setFiltro(e.target.value)} />
+          <input className="border-b-2 w-2/3" value={filtro} onChange={e => setFiltro(e.target.value)} />
           </p>
         <Boton iconol={<Icon className="h-5 w-5" icon={"ic:round-plus"}/>} texto="Agregar taller" color="indigo" onClick={abrirModal} addons="mx-5" />
           </div>
