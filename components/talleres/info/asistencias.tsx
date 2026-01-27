@@ -4,6 +4,7 @@ import { useBackend } from "../../context/backend";
 import { Boton } from "../../general/input/boton";
 import { ModalPasarLista } from "../../general/modales/modalPasarLista";
 import { GrillaAsistencias } from "./grillaAsistencias";
+import { Icon } from "@iconify/react";
 
 interface AsistenciasProps {
   taller: Taller,
@@ -23,6 +24,6 @@ export const Asistencias = ({ taller, mes }: AsistenciasProps) => {
   return <div className="flex flex-col items-center">
     {pasandoLista && <ModalPasarLista taller={taller} cerrar={cerrarLista} />}
     <GrillaAsistencias taller={taller} mes={mes} />
-    <Boton texto="Pasar lista" color="emerald" onClick={abrirLista} />
+    <Boton iconol={<Icon icon={"icon-park-outline:list"}/>} texto="Pasar lista" color="emerald" onClick={abrirLista} />
   </div>
 }
